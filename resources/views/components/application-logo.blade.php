@@ -1,0 +1,1 @@
+<img {{ $attributes }} src="{{ URL('images/logo.png')}}"  alt="FlowBite Logo" />
