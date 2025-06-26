@@ -147,7 +147,7 @@
                                                 <a href="{{ route('holiday.edit' ,$holiday->id ) }}" class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                                             </li>
                                             <li>
-                                                <a href="" class="block py-2 px-4 hover:bg-gray-100 ">Add Itenary</a>
+                                                <a href="{{ route('holiday.itenery-index',$holiday) }}" class="block py-2 px-4 hover:bg-gray-100 ">Add Itenary</a>
                                             </li>
                                         </ul>
                                         <div class="py-1">

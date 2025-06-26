@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHolidayRequest;
 use App\Http\Requests\UpdateHolidayRequest;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class HolidayController extends Controller
 {
@@ -431,4 +432,227 @@ class HolidayController extends Controller
     {
         //
     }
+
+
+    public function itinerary_index(Request $request, Holiday $holiday)
+    {
+        $itineraries = json_decode($holiday->itineraries, true);
+        // dd($holiday);  
+        return view('pages.holidays.itinerary.index')->with(['holiday' => $holiday, 'itineraries' => $itineraries]);
+    }
+
+    public function itinerary_create(Request $request, Holiday $holiday)
+    {
+        return view('pages.holidays.itinerary.create')->with('holiday', $holiday);
+    }
+
+    public function itinerary_store(Request $request, Holiday $holiday)
+    {
+        $validatedData = $request->validate([
+            'day_title' => 'required',
+            'day_description' => 'required',
+        ]);
+
+        $itineraries = json_decode($holiday->itineraries, true) ?? [];
+        $newImages = [];
+        if (!empty($request->file('day_images'))) {
+            foreach ($request->file('day_images') as $image) {
+                $imagePath = $image->store('public/holidays_itinerary_images');
+                $newImages[] = [
+                    'file_name' => $imagePath,
+                    'full_path' => Storage::url($imagePath),
+                ];
+            }
+        }
+
+        $itineraries[] = [
+            "id" => uniqid(),
+            "day_title" => $validatedData['day_title'],
+            "day_description" => $validatedData['day_description'],
+            "day_images" => $newImages,
+            "created_at" => now()->toDateTimeString(),
+        ];
+
+        $holiday->update(['itineraries' => json_encode($itineraries, JSON_UNESCAPED_SLASHES)]);
+        $itineraries = json_decode($holiday->itineraries, true) ?? [];
+
+
+        // Return JSON response with redirect URL
+        return response()->json([
+            'success' => true,
+            'message' => 'Itinerary Added Successfully!',
+            'redirect' => route('holiday.itenery-index', $holiday),
+        ]);
+    }
+
+    public function itinerary_show(Holiday $holiday, $itenery_id)
+    {
+        $itineraries = json_decode($holiday->itineraries, true);
+        $itinerary = [];
+
+        foreach ($itineraries as $iteneryData) {
+            if ($iteneryData['id'] == $itenery_id) {
+                $itinerary = $iteneryData;
+                break;
+            }
+        }
+        return view('pages.holidays.itinerary.show')->with(['holiday' => $holiday, 'itinerary' => $itinerary]);
+    }
+
+    public function itinerary_edit($itenery_id, Holiday $holiday)
+    {
+        $itineraries = json_decode($holiday->itineraries, true);
+        $itinerary = [];
+
+        foreach ($itineraries as $iteneryData) {
+            if ($iteneryData['id'] == $itenery_id) {
+                $itinerary = $iteneryData;
+                break;
+            }
+        }
+        // dd($itinerary);
+        return view('pages.holidays.itinerary.edit')->with(['holiday' => $holiday, 'itinerary' => $itinerary]);
+    }
+
+    public function itinerary_update(Request $request, Holiday $holiday, $itineraryid)
+    {
+
+        $validatedData = $request->validate([
+            'day_title' => 'nullable',
+            'day_description' => 'nullable',
+        ]);
+
+        $existingItineraries = json_decode($holiday->itineraries, true) ?? [];
+        $itinerartKey = 0;
+        $Exsitingitinerary = [];
+
+
+        $itineraryData = [
+            "id" => $itineraryid,
+            "day_title" => $validatedData['day_title'],
+            "day_description" => $validatedData['day_description'],
+            "day_images" => $request->day_images,
+        ];
+
+
+        foreach ($existingItineraries as $key => $existingItineraryData) {
+
+            if ((string)$existingItineraryData['id'] == $itineraryid) {
+                $itinerartKey = $key;
+                $Exsitingitinerary = $existingItineraryData;
+                break;
+            }
+        }
+        $ExsitingitineraryDayImages = $Exsitingitinerary['day_images'];
+
+
+        // Initialize an array to store updated images
+        $updatedImages = $ExsitingitineraryDayImages;
+
+        // Check if there are new images to be added
+        if (!empty($itineraryData['day_images'])) {
+            foreach ($request->file('day_images') as $image) {
+                $imagePath = $image->store('public/holidays_itinerary_images');
+                $updatedImages[] = [
+                    'file_name' => $imagePath,
+                    'full_path' => Storage::url($imagePath),
+                ];
+            }
+        } else {
+            $updatedImages = $Exsitingitinerary['day_images'];
+        }
+
+        $Exsitingitinerary['day_title'] = $validatedData['day_title'];
+        $Exsitingitinerary['day_description'] = $validatedData['day_description'];
+        $Exsitingitinerary['day_images'] = $updatedImages;
+
+        $existingItineraries[$itinerartKey] = $Exsitingitinerary;
+
+        $holiday->update(['itineraries' => json_encode($existingItineraries, JSON_UNESCAPED_SLASHES)]);
+
+
+        // Return JSON response with redirect URL
+        return response()->json([
+            'success' => true,
+            'message' => 'Itinerary Updated Successfully!',
+            'redirect' => route('holiday.itenery-index', $holiday),
+        ]);
+    }
+
+
+     public function itinerary_destroy(Request $request, $itinerary_id, Holiday $holiday)
+    {
+
+        $itineraries = json_decode($holiday->itineraries, true);
+        $itinerary = [];
+
+        foreach ($itineraries as $key => $iteneryData) {
+            if ((string)$iteneryData['id'] == $itinerary_id) {
+                unset($itineraries[$key]);
+                break;
+            }
+        }
+
+        $holiday->update(['itineraries' => json_encode(array_values($itineraries), JSON_UNESCAPED_SLASHES)]);
+
+
+        return  redirect()->route('holiday.itenery-index', $holiday);
+    }
+
+    public function deleteImage(Request $request)
+    {
+
+        try {
+            // Construct the full path (ensure it matches stored path)
+            $filePath =  $request->file_name;
+            $holiday = Holiday::find($request->holiday_id);
+            $itenery_id = $request->itinerary_id;
+
+            $itineraries = json_decode($holiday->itineraries, true);
+            $itinerary = [];
+            $itinerartKey = 0;
+
+
+            $data = Json_decode($request->data_, true);
+            $day_title = $data['day_title'];
+            $day_description = $data['day_description'];
+
+            foreach ($itineraries as $key => $iteneryData) {
+
+                if ((string)$iteneryData['id'] == $itenery_id) {
+                    $itinerartKey = $key;
+                    $itinerary = $iteneryData;
+                    break;
+                }
+            }
+
+            // Check if the file exists
+            if (Storage::exists($filePath)) {
+                // Delete the file from storage
+                $deleted = Storage::delete($filePath);
+            }
+
+
+            //Remove the image from the array
+            foreach ($itinerary['day_images'] as $key => $image) {
+                if ($image['file_name'] == $filePath) {
+                    unset($itinerary['day_images'][$key]);
+                }
+            }
+            $itinerary['day_title'] = $day_title;
+            $itinerary['day_description'] = $day_description;
+
+            //Save Itenerary
+            $itineraries[$itinerartKey] = $itinerary;
+
+            //Update the holiday
+            $holiday->update(['itineraries' => json_encode($itineraries, JSON_UNESCAPED_SLASHES)]);
+
+
+            return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
+        } catch (\Throwable $th) {
+           dd($th);
+        }
+    }
+
 }

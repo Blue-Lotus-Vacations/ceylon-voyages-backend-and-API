@@ -36,9 +36,21 @@ Route::middleware('auth')->group(function () {
     Route::get('/holidays/edit-holiday/{holiday_id}', [HolidayController::class, 'edit'])->name('holiday.edit');
     Route::put('/holidays/edit-holiday/{holiday_id}', [HolidayController::class, 'update'])->name('holiday.update');
 
+
+    //holiday itinerary
+    Route::get('/holidays/itinerary/index/{holiday}', [HolidayController::class, 'itinerary_index'])->name('holiday.itenery-index');
+    Route::get('/holidays/{holiday}/itinerary/{itinerary}', [HolidayController::class, 'itinerary_show'])->name('holiday.itenery-show');
+    Route::get('/holidays/itinerary/create/{holiday}', [HolidayController::class, 'itinerary_create'])->name('holiday.itenery-create');
+    Route::post('/holidays/itinerary/store/{holiday}', [HolidayController::class, 'itinerary_store'])->name('holiday.itenery-store');
+    Route::get('/holidays/itinerary/edit/{itinerary}/holiday/{holiday}', [HolidayController::class, 'itinerary_edit'])->name('holiday.itenery-edit');
+    Route::put('/holidays/itinerary/update/{holiday}/{itinerary}', [HolidayController::class, 'itinerary_update'])->name('holiday.itenery-update');
+
+
+    Route::get('/holidays/itinerary/delete/{itinerary}/{holiday}', [HolidayController::class, 'itinerary_destroy'])->name('holiday.itenery-delete');
+    Route::delete('/itinerary-images/delete', [HolidayController::class, 'deleteImage'])->name('holiday.itenery-image-delete');
+
     //assets
     Route::delete('/assets/{asset_id}', [AssetController::class, 'destroy'])->name('assets.delete');
-
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
