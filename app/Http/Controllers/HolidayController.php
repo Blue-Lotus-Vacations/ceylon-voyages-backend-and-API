@@ -117,10 +117,11 @@ class HolidayController extends Controller
 
         #region Featured Image
         $imagePathfeatured_image = $request->file('featured_image')->store('public/holiday_images/' . uniqid());
+        $featuredUrlFullPath = asset(Storage::url($imagePathfeatured_image));
 
         Asset::create([
             'referenceId' => $holiday->id,
-            'file_path' => $imagePathfeatured_image,
+            'file_path' => $featuredUrlFullPath,
             'attachment_type' => "Holiday Image",
             'IsFeatured_image' => true
         ]);
@@ -131,9 +132,11 @@ class HolidayController extends Controller
 
             if (isset($request->file('holiday_images')[$i - 1])) {
                 $imagePath = $request->file('holiday_images')[$i - 1]->store('public/holiday_images');
+                $imageUrlFullPath = asset(Storage::url($imagePath));
+
                 Asset::create([
                     'referenceId' => $holiday->id,
-                    'file_path' => $imagePath,
+                    'file_path' => $imageUrlFullPath,
                     'attachment_type' => "Holiday Image",
                     'IsFeatured_image' => false
                 ]);
@@ -254,7 +257,7 @@ class HolidayController extends Controller
         $savedItineraryCards = [];
 
         // Get existing seasons details from the featured holiday
-        $existingItineraryCards = json_decode($holidays->itinerary_card?? '[]', true);
+        $existingItineraryCards = json_decode($holidays->itinerary_card ?? '[]', true);
         // $existingYoutubeLinks = $existingYoutubeLinks['youtube_shorts'] ?? [];
 
         if ($request->has('itinerary_cards')) {
@@ -302,7 +305,7 @@ class HolidayController extends Controller
         $savedCostIncludes = [];
 
         // Get existing seasons details from the featured holiday
-        $existingCostIncludes = json_decode($holidays->cost_includes?? '[]', true);
+        $existingCostIncludes = json_decode($holidays->cost_includes ?? '[]', true);
         // $existingYoutubeLinks = $existingYoutubeLinks['youtube_shorts'] ?? [];
 
         if ($request->has('itinerary_cards')) {
@@ -323,7 +326,7 @@ class HolidayController extends Controller
 
                 // Build the JSON structure for the new season
                 $savedCostIncludes[] = [
-                     "id" => $cost_include['id'],
+                    "id" => $cost_include['id'],
                     "description" => $cost_include['description'],
                     "created_at" => now()->toDateTimeString()
                 ];
@@ -349,17 +352,17 @@ class HolidayController extends Controller
         $savedMulticities = [];
 
         // Get existing seasons details from the featured holiday
-        $existingMultiCities = json_decode($holidays->tour_map?? '[]', true);
+        $existingMultiCities = json_decode($holidays->tour_map ?? '[]', true);
         // $existingYoutubeLinks = $existingYoutubeLinks['youtube_shorts'] ?? [];
 
         if ($request->has('coordinates_json')) {
             $multicities = json_decode($request->coordinates_json, true);
 
-            foreach ( $multicities as  $multicity) {
+            foreach ($multicities as  $multicity) {
                 $isExisting = false;
 
                 // Check if season already exists in the existing seasons array
-                foreach ( $existingMultiCities as  $existingMultiCity) {
+                foreach ($existingMultiCities as  $existingMultiCity) {
                     if ($existingMultiCity['id'] == $multicity['id']) {
                         $isExisting = true;
                         break;
@@ -380,7 +383,7 @@ class HolidayController extends Controller
             if (!empty($savedMulticities)) {
                 $existingMultiCities = $savedMulticities;
             } else if (empty($multicities)) {
-               $existingMultiCities = [];
+                $existingMultiCities = [];
             }
 
             // Save or update the seasons data in the request
@@ -398,9 +401,10 @@ class HolidayController extends Controller
 
                 if (isset($request->file('holiday_images')[$i - 1])) {
                     $imagePath = $request->file('holiday_images')[$i - 1]->store('public/holiday_images');
+                    $imageUrlFullPath = asset(Storage::url($imagePath));
                     Asset::updateOrCreate([
                         'referenceId' => $holidays->id,
-                        'file_path' => $imagePath,
+                        'file_path' => $imageUrlFullPath,
                         'attachment_type' => "Holiday Image",
                         'IsFeatured_image' => false
                     ]);
@@ -411,9 +415,10 @@ class HolidayController extends Controller
         if (!empty($request->file('featured_image'))) {
 
             $imagePathfeatured_image = $request->file('featured_image')->store('public/holiday_images');
+            $featuredUrlFullPath = asset(Storage::url($imagePathfeatured_image));
             Asset::updateOrCreate([
                 'referenceId' => $holidays->id,
-                'file_path' => $imagePathfeatured_image,
+                'file_path' => $featuredUrlFullPath,
                 'attachment_type' => "Holiday Image",
                 'IsFeatured_image' => true
             ]);
@@ -421,8 +426,6 @@ class HolidayController extends Controller
 
 
         return redirect()->route('holiday.edit', $holidays)->with('success', "Holiday Updated Successfuly");
-
-
     }
 
     /**
@@ -458,9 +461,10 @@ class HolidayController extends Controller
         if (!empty($request->file('day_images'))) {
             foreach ($request->file('day_images') as $image) {
                 $imagePath = $image->store('public/holidays_itinerary_images');
+                $imageUrlFullPath = asset(Storage::url($imagePath));
                 $newImages[] = [
                     'file_name' => $imagePath,
-                    'full_path' => Storage::url($imagePath),
+                    'full_path' => $imageUrlFullPath,
                 ];
             }
         }
@@ -553,8 +557,9 @@ class HolidayController extends Controller
         if (!empty($itineraryData['day_images'])) {
             foreach ($request->file('day_images') as $image) {
                 $imagePath = $image->store('public/holidays_itinerary_images');
+                $imageUrlFullPath = asset(Storage::url($imagePath));
                 $updatedImages[] = [
-                    'file_name' => $imagePath,
+                    'file_name' => $imageUrlFullPath,
                     'full_path' => Storage::url($imagePath),
                 ];
             }
@@ -580,7 +585,7 @@ class HolidayController extends Controller
     }
 
 
-     public function itinerary_destroy(Request $request, $itinerary_id, Holiday $holiday)
+    public function itinerary_destroy(Request $request, $itinerary_id, Holiday $holiday)
     {
 
         $itineraries = json_decode($holiday->itineraries, true);
@@ -651,8 +656,14 @@ class HolidayController extends Controller
 
             return response()->json(['success' => true, 'message' => 'Image deleted successfully']);
         } catch (\Throwable $th) {
-           dd($th);
+            dd($th);
         }
     }
 
+
+    public function holidayApi()
+    {
+        $holidays = Holiday::all(); 
+        return response()->json($holidays);
+    }
 }

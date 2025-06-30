@@ -276,7 +276,7 @@
                         @foreach ($featured_images as $featured_image)
                         <div class=" text-center items-center justify-center w-full">
                             <img class="border-blue-100 hover:opacity-75 w-full h-48 object-cover rounded-lg transition-transform transform scale-100 group-hover:scale-105"
-                                src="{{ Storage::url($featured_image->file_path) }}">
+                                src="{{ url($featured_image->file_path) }}">
                             <button class="mt-2" type="button"
                                 onclick="DeleteImage('{{ $featured_image->id }}')">
                                 <svg class="bg-red-100 mx-auto w-6 h-6 rounded text-red-800 dark:text-white"
@@ -332,7 +332,7 @@
                         @if (!$asset->IsFeatured_image)
                         <div class=" text-center items-center justify-center w-full">
                             <img class="border-blue-100 hover:opacity-75 w-full h-48 object-cover rounded-lg transition-transform transform scale-100 group-hover:scale-105"
-                                src="{{ Storage::url($asset->file_path) }}">
+                                src="{{ url($asset->file_path) }}">
                             <button class="mt-2" type="button"
                                 onclick="DeleteImage('{{ $asset->id }}')">
                                 <svg class="bg-red-100 mx-auto w-6 h-6 rounded text-red-800 dark:text-white"

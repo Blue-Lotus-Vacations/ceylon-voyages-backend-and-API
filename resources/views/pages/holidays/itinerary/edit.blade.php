@@ -43,7 +43,7 @@
                             @foreach ($itinerary['day_images'] as $image)
 
                             <div class="relative group">
-                                <img src="{{ Storage::url($image['file_name']) }}" alt="Day Image"
+                                <img src="{{ url($image['full_path']) }}" alt="Day Image"
                                     class="w-full h-32 object-cover rounded shadow-md">
                                 <!-- Delete Button -->
                                 <button type="button" onclick="removeImage('{{ $image['file_name'] }}', this, '{{ $itinerary['id'] }}', '{{ $holiday->id }}')"

@@ -16,6 +16,7 @@
     </head>
     <body class="font-sans antialiased">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
+         <script src="https://kit.fontawesome.com/a23cd217c4.js" crossorigin="anonymous"></script>
         
         <div class="min-h-screen bg-gray-100 dark:bg-gray-900">
             @include('layouts.navigation')
