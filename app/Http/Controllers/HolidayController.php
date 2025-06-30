@@ -663,7 +663,7 @@ class HolidayController extends Controller
 
     public function holidayApi()
     {
-        $holidays = Holiday::all(); 
+        $holidays = Holiday::with('assets')->get();
         return response()->json($holidays);
     }
 }
