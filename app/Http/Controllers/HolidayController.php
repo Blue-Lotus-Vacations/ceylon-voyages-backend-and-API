@@ -183,6 +183,8 @@ class HolidayController extends Controller
     public function update(Request $request,  $holiday_id)
     {
 
+        // dd($request);
+
         $holidays = Holiday::with('assets')->find($holiday_id);
 
         // dd($holidays);
@@ -230,7 +232,7 @@ class HolidayController extends Controller
                 ]);
             } else {
                 $request->validate([
-                    'destination_images' => 'required',
+                    'holiday_images' => 'required',
                 ]);
             }
         }
@@ -375,7 +377,7 @@ class HolidayController extends Controller
                     "id" => $multicity['id'], // Unique ID for the city
                     "latitude" => $multicity['latitude'], // Latitude of the city
                     "longitude" => $multicity['longitude'], // Longitude of the city
-                    "created_at" => now()->format('Y-m-d H:i:s.u'), // Timestamp
+                    "created_at" => now()->toDateTimeString(), // Timestamp
                 ];
             }
 
