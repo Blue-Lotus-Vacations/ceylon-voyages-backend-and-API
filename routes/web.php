@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Route;
 */
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\DestinationCategoryController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -44,10 +45,17 @@ Route::middleware('auth')->group(function () {
     Route::post('/holidays/itinerary/store/{holiday}', [HolidayController::class, 'itinerary_store'])->name('holiday.itenery-store');
     Route::get('/holidays/itinerary/edit/{itinerary}/holiday/{holiday}', [HolidayController::class, 'itinerary_edit'])->name('holiday.itenery-edit');
     Route::put('/holidays/itinerary/update/{holiday}/{itinerary}', [HolidayController::class, 'itinerary_update'])->name('holiday.itenery-update');
-
-
     Route::get('/holidays/itinerary/delete/{itinerary}/{holiday}', [HolidayController::class, 'itinerary_destroy'])->name('holiday.itenery-delete');
     Route::delete('/itinerary-images/delete', [HolidayController::class, 'deleteImage'])->name('holiday.itenery-image-delete');
+
+
+    //destionation categories
+    Route::get('/destination-category', [DestinationCategoryController::class, 'index'])->name('destination-category');
+    Route::get('/destination-category/create-destination-category', [DestinationCategoryController::class, 'create'])->name('destination-category-create');
+    Route::post('/destination-category/create-destination-category', [DestinationCategoryController::class, 'store'])->name('destination-category.store');
+    Route::get('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'edit'])->name('destination_category.edit');
+    Route::put('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'update'])->name('destination_category.update');
+    
 
     //assets
     Route::delete('/assets/{asset_id}', [AssetController::class, 'destroy'])->name('assets.delete');
