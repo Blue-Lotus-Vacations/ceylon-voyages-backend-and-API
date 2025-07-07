@@ -129,6 +129,19 @@ class DestinationCategoryController extends Controller
         // dd($request);
     }
 
+
+    public function destinationCategoryApi()
+    {
+        $destinationCategories = DestinationCategory::with([
+            'assets',
+            'destinations.assets'  // Load holidays and their assets
+        ])->get();
+
+        return response()->json($destinationCategories);
+    }
+
+
+
     /**
      * Remove the specified resource from storage.
      */
