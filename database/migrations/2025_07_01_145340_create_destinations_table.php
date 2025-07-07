@@ -13,6 +13,15 @@ return new class extends Migration
     {
         Schema::create('destinations', function (Blueprint $table) {
             $table->id();
+            $table->string('destination_name')->nullable();
+            $table->string('destination_category')->nullable();
+            $table->text('destination_card_summary')->nullable();
+            $table->boolean('isFavorite')->nullable();
+            $table->longtext('highlights')->nullable();
+            $table->longtext('visit_time')->nullable();
+            $table->longtext('worth_a_visit')->nullable();
+            $table->longtext('culture')->nullable();
+            $table->longtext('food')->nullable();
             $table->timestamps();
         });
     }

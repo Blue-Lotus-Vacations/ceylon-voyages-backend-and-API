@@ -18,4 +18,10 @@ class DestinationCategory extends Model
         return $this->hasMany(Asset::class, 'referenceId')->where('attachment_type', 'Destination Category Image');
     }
 
+
+    public function destinations()
+    {
+        return $this->hasMany(Destination::class,'destination_category');
+    }
+
 }

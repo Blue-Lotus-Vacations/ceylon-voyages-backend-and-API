@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\DestinationCategoryController;
+use App\Http\Controllers\DestinationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -56,6 +57,11 @@ Route::middleware('auth')->group(function () {
     Route::get('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'edit'])->name('destination_category.edit');
     Route::put('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'update'])->name('destination_category.update');
     
+
+    //destinations
+    Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
+    Route::get('/destinations/create-destinations', [DestinationController::class, 'create'])->name('destination-create');
+    Route::post('/destinations/create-destinations', [DestinationController::class, 'store'])->name('destination.store');
 
     //assets
     Route::delete('/assets/{asset_id}', [AssetController::class, 'destroy'])->name('assets.delete');
