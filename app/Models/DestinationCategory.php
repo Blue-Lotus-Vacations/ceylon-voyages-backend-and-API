@@ -10,7 +10,8 @@ class DestinationCategory extends Model
     use HasFactory;
 
     protected $fillable = [
-        'destination_category_name'
+        'destination_category_name',
+        'slug'
      ];
 
      public function assets()

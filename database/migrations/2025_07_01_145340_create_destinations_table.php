@@ -22,6 +22,7 @@ return new class extends Migration
             $table->longtext('worth_a_visit')->nullable();
             $table->longtext('culture')->nullable();
             $table->longtext('food')->nullable();
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }

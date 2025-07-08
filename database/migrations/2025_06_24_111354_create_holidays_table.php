@@ -27,6 +27,7 @@ return new class extends Migration
             $table->longtext('aditional_information')->nullable();
             $table->boolean('isFavorite')->nullable();
             $table->longtext('hot_deals')->nullable();
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }

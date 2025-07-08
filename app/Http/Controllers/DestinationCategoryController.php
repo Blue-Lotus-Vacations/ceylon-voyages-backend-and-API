@@ -37,6 +37,7 @@ class DestinationCategoryController extends Controller
     {
         $validatedData = $request->validate([
             'destination_category_name' => 'required',
+            'slug'=>'required'
         ]);
 
         $destinationCategory = DestinationCategory::create($validatedData);
@@ -106,6 +107,7 @@ class DestinationCategoryController extends Controller
 
         $validatedData = $request->validate([
             'destination_category_name' => 'required',
+            'slug'=>'required'
         ]);
 
 
@@ -134,10 +136,20 @@ class DestinationCategoryController extends Controller
     {
         $destinationCategories = DestinationCategory::with([
             'assets',
-            'destinations.assets'  // Load holidays and their assets
+            'destinations.assets',  // Load holidays and their assets
         ])->get();
 
         return response()->json($destinationCategories);
+    }
+
+
+    public function checkSlug(Request $request)
+    {
+        $slug = $request->query('slug');
+
+        $exists = DestinationCategory::where('slug', $slug)->exists();
+
+        return response()->json(['available' => !$exists]);
     }
 
 

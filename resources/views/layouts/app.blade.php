@@ -14,6 +14,7 @@
         <!-- Scripts -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     </head>
+    @stack('scripts')
     <body class="font-sans antialiased">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.3.0/flowbite.min.js"></script>
          <script src="https://kit.fontawesome.com/a23cd217c4.js" crossorigin="anonymous"></script>

@@ -56,6 +56,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/destination-category/create-destination-category', [DestinationCategoryController::class, 'store'])->name('destination-category.store');
     Route::get('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'edit'])->name('destination_category.edit');
     Route::put('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'update'])->name('destination_category.update');
+    Route::get('/destination-category/check-slug', [DestinationCategoryController::class, 'checkSlug'])->name('destination_category.slug');
     
 
     //destinations
