@@ -46,7 +46,8 @@ class HolidayController extends Controller
             'itinerary_description' => 'required',
             'cost_includes_description' => 'required',
             'tour_map_description' => 'required',
-            'aditional_information' => 'required'
+            'aditional_information' => 'required',
+            'slug' => 'required'
         ]);
 
         // Is Favourite 
@@ -245,7 +246,8 @@ class HolidayController extends Controller
             'itinerary_description' => 'required',
             'cost_includes_description' => 'required',
             'tour_map_description' => 'required',
-            'aditional_information' => 'required'
+            'aditional_information' => 'required',
+            'slug' => 'required'
         ]);
 
         if ($request->isFavorite == "on") {
@@ -668,4 +670,15 @@ class HolidayController extends Controller
         $holidays = Holiday::with('assets')->get();
         return response()->json($holidays);
     }
+
+
+     public function checkSlug(Request $request)
+    {
+        $slug = $request->query('slug');
+
+        $exists = Holiday::where('slug', $slug)->exists();
+
+        return response()->json(['available' => !$exists]);
+    }
+
 }

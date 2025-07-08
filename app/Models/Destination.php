@@ -18,7 +18,8 @@ class Destination extends Model
         'visit_time',
         'worth_a_visit',
         'culture',
-        'food'
+        'food',
+        'slug'
     ];
 
     public function destination_categories()

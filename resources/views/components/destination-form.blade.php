@@ -37,6 +37,21 @@
                     </div>
 
 
+                    <!-- slug -->
+                    <div class="w-full">
+                        <label for="slug"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slug</label>
+                        <input type="text"
+                            value="{{ old('slug', $destination->slug ?? '') }}"
+                            name="slug"
+                            id="slug"
+                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                            placeholder="Slug will be auto-generated (but you can edit)">
+                        <div id="slug-status" class="text-sm mt-1"></div>
+                        <x-input-error :messages="$errors->get('slug')" class="mt-2" />
+                    </div>
+
+
                     <!-- Category -->
                     <div class="w-full">
                         <label for="destination_category"
@@ -359,7 +374,7 @@
                 </div>
 
 
-                
+
 
 
                 <!-- Culture Section -->
@@ -397,7 +412,7 @@
 
 
                 <!-- map image -->
-                 @if (isset($destination))
+                @if (isset($destination))
                 <div>
                     <div class="grid grid-cols-6 md:grid-cols-6 gap-3 p-4 place-items-center">
                         @foreach ($destination->assets as $asset)
@@ -1044,3 +1059,71 @@
             }
         });
     </script>
+
+
+    <!-- slug script  -->
+    @push('scripts')
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script>
+        function slugify(text) {
+            return text.toLowerCase()
+                .trim()
+                .replace(/\s+/g, '-') // Replace spaces with -
+                .replace(/[^\w\-]+/g, '') // Remove special characters
+                .replace(/\-\-+/g, '-'); // Replace multiple - with single -
+        }
+
+        $(document).ready(function() {
+            let typingTimer;
+            const doneTypingInterval = 500;
+
+            $('#destination_name').on('input', function() {
+                const slug = slugify($(this).val());
+                $('#slug').val(slug);
+                checkSlugAvailability(slug);
+            });
+
+            $('#slug').on('input', function() {
+                clearTimeout(typingTimer);
+                const slug = $(this).val();
+                typingTimer = setTimeout(() => {
+                    checkSlugAvailability(slug);
+                }, doneTypingInterval);
+            });
+
+            function checkSlugAvailability(slug) {
+                if (!slug) {
+                    $('#slug-status').text('').removeClass('text-green-600 text-red-600');
+                    return;
+                }
+
+                $.ajax({
+                    url: '{{ url("/destinations/check-slug") }}',
+                    method: 'GET',
+                    data: {
+                        slug: slug
+                    },
+                    success: function(res) {
+                        if (res.available) {
+                            $('#slug-status')
+                                .text('✅ Slug is available')
+                                .removeClass('text-red-600')
+                                .addClass('text-green-600');
+                        } else {
+                            $('#slug-status')
+                                .text('❌ Slug is already taken')
+                                .removeClass('text-green-600')
+                                .addClass('text-red-600');
+                        }
+                    },
+                    error: function() {
+                        $('#slug-status')
+                            .text('Error checking slug.')
+                            .removeClass('text-green-600')
+                            .addClass('text-red-600');
+                    }
+                });
+            }
+        });
+    </script>
+    @endpush

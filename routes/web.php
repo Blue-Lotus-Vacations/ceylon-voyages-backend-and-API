@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/holidays/create-holiday', [HolidayController::class, 'store'])->name('holidays.store');
     Route::get('/holidays/edit-holiday/{holiday_id}', [HolidayController::class, 'edit'])->name('holiday.edit');
     Route::put('/holidays/edit-holiday/{holiday_id}', [HolidayController::class, 'update'])->name('holiday.update');
+    Route::get('/holidays/check-slug', [HolidayController::class, 'checkSlug'])->name('holiday.slug');
 
 
     //holiday itinerary
@@ -63,6 +64,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
     Route::get('/destinations/create-destinations', [DestinationController::class, 'create'])->name('destination-create');
     Route::post('/destinations/create-destinations', [DestinationController::class, 'store'])->name('destination.store');
+    Route::get('/destinations/check-slug', [DestinationController::class, 'checkSlug'])->name('destination.slug');
 
     //assets
     Route::delete('/assets/{asset_id}', [AssetController::class, 'destroy'])->name('assets.delete');

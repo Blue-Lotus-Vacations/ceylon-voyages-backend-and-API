@@ -46,7 +46,8 @@ class DestinationController extends Controller
         $validatedData = $request->validate([
             'destination_name' => 'required',
             'destination_category' => 'required',
-            'destination_card_summary' => 'required'
+            'destination_card_summary' => 'required',
+            'slug' => 'required'
         ]);
 
 
@@ -286,6 +287,16 @@ class DestinationController extends Controller
     {
         $destinations = Destination::with('assets')->get();
         return response()->json($destinations);
+    }
+
+
+     public function checkSlug(Request $request)
+    {
+        $slug = $request->query('slug');
+
+        $exists = Destination::where('slug', $slug)->exists();
+
+        return response()->json(['available' => !$exists]);
     }
 
 }
