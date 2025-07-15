@@ -31,16 +31,6 @@
                     <li>
                         <a href="{{ route('holidays') }}" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">All Holidays</a>
                     </li>
-
-                    <li>
-                        <a href="" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">All Holiday Categories</a>
-                    </li>
-                    <li>
-                        <a href="" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Add New Holiday</a>
-                    </li>
-                    <li>
-                        <a href="" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Add New Category</a>
-                    </li>
                 </ul>
             </li>
 
@@ -66,12 +56,6 @@
                     </li>
                     <li>
                         <a href="{{ route('destination-category') }}" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">All Destination Categories</a>
-                    </li>
-                    <li>
-                        <a href="" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Add New Holiday</a>
-                    </li>
-                    <li>
-                        <a href="" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">Add New Category</a>
                     </li>
                 </ul>
             </li>
