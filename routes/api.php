@@ -1,7 +1,11 @@
 <?php
 
+use App\Http\Controllers\DestinationCategoryController;
+use App\Http\Controllers\DestinationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\HolidayController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -17,3 +21,6 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+    Route::get('/holidays', [HolidayController::class, 'holidayApi']);
+    Route::get('/destinations', [DestinationController::class, 'destinationApi']);
+    Route::get('/destination-categories', [DestinationCategoryController::class, 'destinationCategoryApi']);

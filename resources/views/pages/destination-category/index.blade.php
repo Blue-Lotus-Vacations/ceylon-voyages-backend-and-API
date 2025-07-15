@@ -39,12 +39,11 @@
                      @endif
                      <div class="flex items-center justify-between space-x-4 pt-3">
                          <div class="flex-1 flex items-center space-x-3">
-                             <h5 class="dark:text-white font-semibold">All Holidays</h5>
+                             <h5 class="dark:text-white font-semibold">All Destination Categories</h5>
                          </div>
                      </div>
 
                      <div class="flex flex-col-reverse md:flex-row items-center justify-between md:space-x-4 py-3">
-
                          <div class="w-full lg:w-2/3 flex flex-col space-y-3 md:space-y-0 md:flex-row md:items-center">
                              <!-- search for Holidays  -->
 
@@ -52,15 +51,13 @@
                          </div>
 
                          <div class="w-full md:w-auto flex flex-col md:flex-row mb-3 md:mb-0 items-stretch md:items-center justify-end md:space-x-3 flex-shrink-0">
-                             <a href="{{ route('holidays-create') }}" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
+                             <a href="{{ route('destination-category-create') }}" class="flex items-center justify-center text-white bg-primary-700 hover:bg-primary-800 focus:ring-4 focus:ring-primary-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-600 dark:hover:bg-primary-700 focus:outline-none dark:focus:ring-primary-800">
                                  <svg class="h-3.5 w-3.5 mr-2" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
                                      <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" />
                                  </svg>
-                                 Add new Holiday
+                                 Add new Destination Category
                              </a>
                          </div>
-
-
                      </div>
                  </div>
 
@@ -73,25 +70,7 @@
                              <tr>
 
                                  <th scope="col" class="px-4 py-3 min-w-[14rem]">Holiday</th>
-                                 <th scope="col" class="px-4 py-3 min-w-[10rem]">
-                                     Price
-                                     <svg class="h-4 w-4 ml-1 inline-block" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                         <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" />
-                                     </svg>
-                                 </th>
 
-                                 <th scope="col" class="px-4 py-3 min-w-[10rem]">
-                                     Favourite
-                                     <svg class="h-4 w-4 ml-1 inline-block" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                         <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" />
-                                     </svg>
-                                 </th>
-                                 <th scope="col" class="px-4 py-3 min-w-[10rem]">
-                                     No. Of Days
-                                     <svg class="h-4 w-4 ml-1 inline-block" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                         <path clip-rule="evenodd" fill-rule="evenodd" d="M10 3a.75.75 0 01.55.24l3.25 3.5a.75.75 0 11-1.1 1.02L10 4.852 7.3 7.76a.75.75 0 01-1.1-1.02l3.25-3.5A.75.75 0 0110 3zm-3.76 9.2a.75.75 0 011.06.04l2.7 2.908 2.7-2.908a.75.75 0 111.1 1.02l-3.25 3.5a.75.75 0 01-1.1 0l-3.25-3.5a.75.75 0 01.04-1.06z" />
-                                     </svg>
-                                 </th>
 
                                  <th scope="col" class="px-4 py-3">
                                      <span class="sr-only">Actions</span>
@@ -100,11 +79,12 @@
                          </thead>
 
                          <tbody class="border-b-[40px] border-[#1A437E] ">
-                             @foreach ($holidays as $holiday)
+
+                             @foreach ($destination_categories as $destination_category)
 
 
                              @php
-                             foreach($holiday->assets as $asset){
+                             foreach($destination_category->assets as $asset){
                              if($asset->IsFeatured_image){
                              $featured_image = $asset->file_path;
                              }
@@ -113,41 +93,24 @@
 
 
 
-
-
-
                              <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 ">
 
                                  <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white flex items-center">
                                      <img src="{{url($featured_image) }}" alt="iMac Front Image" class="object-cover w-10 h-10 rounded-full mr-3">
-                                     {{$holiday->deal_name}}
+                                     {{$destination_category->destination_category_name}}
                                  </th>
 
-                                 <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white"> {{$holiday->price}}</td>
-                                 <td class="px-4 py-3">
-                                     @if($holiday->isFavorite)
-                                     Yes
-                                     @else
-                                     No
-                                     @endif
-                                 </td>
-                                 <td class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{$holiday->no_of_nights}}</td>
-
-
                                  <td class="px-4 py-3 ">
-                                    <button id="{{$holiday->holiday_name}}-dropdown-button" type="button" data-dropdown-toggle="{{$holiday->holiday_name}}-dropdown" class="inline-flex items-center p-1 text-sm font-medium text-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100">
+                                    <button id="{{$destination_category->destination_category_name}}-dropdown-button" type="button" data-dropdown-toggle="{{$destination_category->destination_category_name}}-dropdown" class="inline-flex items-center p-1 text-sm font-medium text-center text-gray-500 hover:text-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-lg focus:outline-none dark:text-gray-400 dark:hover:text-gray-100">
                                         <svg class="w-5 h-5" aria-hidden="true" fill="currentColor" viewbox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
                                             <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
                                         </svg>
                                     </button>
-                                    <div id="{{$holiday->holiday_name}}-dropdown" class="hidden  z-50 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
+                                    <div id="{{$destination_category->destination_category_name}}-dropdown" class="hidden  z-50 w-44 bg-white rounded divide-y divide-gray-100 shadow dark:bg-gray-700 dark:divide-gray-600">
 
-                                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="{{$holiday->holiday_name}}-dropdown-button">
+                                        <ul class="py-1 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="{{$destination_category->destination_category_name}}-dropdown-button">
                                             <li>
-                                                <a href="{{ route('holiday.edit' ,$holiday->id ) }}" class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
-                                            </li>
-                                            <li>
-                                                <a href="{{ route('holiday.itenery-index',$holiday) }}" class="block py-2 px-4 hover:bg-gray-100 ">Add Itenary</a>
+                                                <a href="{{ route('destination_category.edit' ,$destination_category->id ) }}" class="block py-2 px-4 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Edit</a>
                                             </li>
                                         </ul>
                                         <div class="py-1">

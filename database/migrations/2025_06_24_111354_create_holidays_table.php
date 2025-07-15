@@ -19,6 +19,7 @@ return new class extends Migration
             $table->longText('itinerary_card')->nullable();
             $table->longText('description')->nullable();
             $table->longText('itinerary_description')->nullable();
+            $table->text('itineraries')->nullable();
             $table->longtext('cost_includes_description')->nullable();
             $table->longtext('cost_includes')->nullable();
             $table->longtext('tour_map_description')->nullable();
@@ -26,6 +27,7 @@ return new class extends Migration
             $table->longtext('aditional_information')->nullable();
             $table->boolean('isFavorite')->nullable();
             $table->longtext('hot_deals')->nullable();
+            $table->string('slug')->nullable();
             $table->timestamps();
         });
     }

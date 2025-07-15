@@ -21,7 +21,9 @@ class Holiday extends Model
         'tour_map_description',
         'tour_map',
         'aditional_information',
-        'isFavorite'
+        'isFavorite',
+        'itineraries',
+        'slug'
      ];
 
      public function assets()

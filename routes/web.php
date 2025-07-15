@@ -15,6 +15,8 @@ use Illuminate\Support\Facades\Route;
 */
 use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AssetController;
+use App\Http\Controllers\DestinationCategoryController;
+use App\Http\Controllers\DestinationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -35,10 +37,37 @@ Route::middleware('auth')->group(function () {
     Route::post('/holidays/create-holiday', [HolidayController::class, 'store'])->name('holidays.store');
     Route::get('/holidays/edit-holiday/{holiday_id}', [HolidayController::class, 'edit'])->name('holiday.edit');
     Route::put('/holidays/edit-holiday/{holiday_id}', [HolidayController::class, 'update'])->name('holiday.update');
+    Route::get('/holidays/check-slug', [HolidayController::class, 'checkSlug'])->name('holiday.slug');
+
+
+    //holiday itinerary
+    Route::get('/holidays/itinerary/index/{holiday}', [HolidayController::class, 'itinerary_index'])->name('holiday.itenery-index');
+    Route::get('/holidays/{holiday}/itinerary/{itinerary}', [HolidayController::class, 'itinerary_show'])->name('holiday.itenery-show');
+    Route::get('/holidays/itinerary/create/{holiday}', [HolidayController::class, 'itinerary_create'])->name('holiday.itenery-create');
+    Route::post('/holidays/itinerary/store/{holiday}', [HolidayController::class, 'itinerary_store'])->name('holiday.itenery-store');
+    Route::get('/holidays/itinerary/edit/{itinerary}/holiday/{holiday}', [HolidayController::class, 'itinerary_edit'])->name('holiday.itenery-edit');
+    Route::put('/holidays/itinerary/update/{holiday}/{itinerary}', [HolidayController::class, 'itinerary_update'])->name('holiday.itenery-update');
+    Route::get('/holidays/itinerary/delete/{itinerary}/{holiday}', [HolidayController::class, 'itinerary_destroy'])->name('holiday.itenery-delete');
+    Route::delete('/itinerary-images/delete', [HolidayController::class, 'deleteImage'])->name('holiday.itenery-image-delete');
+
+
+    //destionation categories
+    Route::get('/destination-category', [DestinationCategoryController::class, 'index'])->name('destination-category');
+    Route::get('/destination-category/create-destination-category', [DestinationCategoryController::class, 'create'])->name('destination-category-create');
+    Route::post('/destination-category/create-destination-category', [DestinationCategoryController::class, 'store'])->name('destination-category.store');
+    Route::get('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'edit'])->name('destination_category.edit');
+    Route::put('/destination-category/edit-destination-category/{destination_category_id}', [DestinationCategoryController::class, 'update'])->name('destination_category.update');
+    Route::get('/destination-category/check-slug', [DestinationCategoryController::class, 'checkSlug'])->name('destination_category.slug');
+    
+
+    //destinations
+    Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
+    Route::get('/destinations/create-destinations', [DestinationController::class, 'create'])->name('destination-create');
+    Route::post('/destinations/create-destinations', [DestinationController::class, 'store'])->name('destination.store');
+    Route::get('/destinations/check-slug', [DestinationController::class, 'checkSlug'])->name('destination.slug');
 
     //assets
     Route::delete('/assets/{asset_id}', [AssetController::class, 'destroy'])->name('assets.delete');
-
 });
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
