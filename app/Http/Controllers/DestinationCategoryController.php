@@ -8,6 +8,7 @@ use App\Http\Requests\StoreDestinationCategoryRequest;
 use App\Http\Requests\UpdateDestinationCategoryRequest;
 use Illuminate\Http\Request;
 use App\Models\Asset;
+use App\Models\Language;
 use Illuminate\Support\Facades\Storage;
 
 class DestinationCategoryController extends Controller
@@ -27,6 +28,10 @@ class DestinationCategoryController extends Controller
      */
     public function create()
     {
+        $languages = Language::all();
+
+        dd($languages);
+
         return view('pages.destination-category.create');
     }
 
