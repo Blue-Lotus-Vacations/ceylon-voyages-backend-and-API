@@ -30,9 +30,9 @@ class DestinationCategoryController extends Controller
     {
         $languages = Language::all();
 
-        dd($languages);
+        // dd($languages);
 
-        return view('pages.destination-category.create');
+        return view('pages.destination-category.create')->with('languages', $languages);
     }
 
     /**
@@ -40,6 +40,8 @@ class DestinationCategoryController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
+
         $validatedData = $request->validate([
             'destination_category_name' => 'required',
             'slug'=>'required'
@@ -81,9 +83,12 @@ class DestinationCategoryController extends Controller
 
         $destination_category = DestinationCategory::with('assets')->find($destination_category_id);
 
+        $languages = Language::all();
+
         return view('pages.destination-category.edit')->with(
             [
-                'destination_category' => $destination_category
+                'destination_category' => $destination_category,
+                'languages' => $languages
             ]
         );
     }
@@ -93,6 +98,8 @@ class DestinationCategoryController extends Controller
      */
     public function update(Request $request,  $destination_category_id)
     {
+        // dd($request);
+
         $destination_category = DestinationCategory::with('assets')->find($destination_category_id);
 
         $featured_image_count = $destination_category->assets->filter(function ($asset) {

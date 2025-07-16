@@ -28,7 +28,7 @@
                 <form action="{{ route('destination-category.store') }}" method="post" enctype="multipart/form-data">
                     @csrf
                     
-                    <x-destination-category-form/>
+                    <x-destination-category-form :languages=$languages/>
 
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-blue-900 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
                         Add Destination Category
