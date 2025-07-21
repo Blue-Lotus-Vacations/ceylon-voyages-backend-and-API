@@ -71,9 +71,9 @@
                                 @foreach ($itineraries as $itinerary)
                                 <tr class="border-b dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700">
 
-                                    <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ $itinerary['day_title'] }}</th>
+                                    <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ json_decode($itinerary['day_title'])->en ?? '' }}</th>
 
-                                    <th scope="row" class="px-4 py-2 font-medium text-gray-900 dark:text-white">{{ $itinerary['day_description'] }}</th>
+                                    <th scope="row" class="px-4 py-2 font-medium text-gray-900 dark:text-white">{{ json_decode($itinerary['day_description'])->en ?? '' }}</th>
 
 
                                     <th scope="row" class="px-4 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">{{ count($itinerary['day_images']) }}</th>

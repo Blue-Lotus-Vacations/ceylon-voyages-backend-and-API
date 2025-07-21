@@ -97,7 +97,7 @@
 
                                  <th scope="row" class="px-4 py-3 font-medium text-gray-900 whitespace-nowrap dark:text-white flex items-center">
                                      <img src="{{url($featured_image) }}" alt="iMac Front Image" class="object-cover w-10 h-10 rounded-full mr-3">
-                                     {{$destination_category->destination_category_name}}
+                                     {{ json_decode($destination_category->destination_category_name)->en ?? '' }}
                                  </th>
 
                                  <td class="px-4 py-3 ">

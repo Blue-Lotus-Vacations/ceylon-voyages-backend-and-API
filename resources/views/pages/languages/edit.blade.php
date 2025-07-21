@@ -40,17 +40,17 @@
                 @endif
                 
                 <div class="items-center space-x-3 py-5">
-                    <h5 class="dark:text-white font-semibold">Edit Holidays</h5>
+                    <h5 class="dark:text-white font-semibold">Edit Language</h5>
                 </div>
 
-                <form action="{{ route('holiday.update' ,$holiday?->id) }}" method="post" enctype="multipart/form-data">
+                <form action="{{ route('language.update' ,$language?->id) }}" method="post" enctype="multipart/form-data">
                     @csrf
                     @method('put')
 
-                    <x-holiday-form :holiday=$holiday :itinerary_cards=$itinerary_cards :cost_includes=$cost_includes :multicities=$multicities :languages=$languages />
+                    <x-languages-form :language=$language/>
 
                     <button type="submit" class="inline-flex items-center px-5 py-2.5 mt-4 sm:mt-6 text-sm font-medium text-center text-white bg-primary-700 rounded-lg focus:ring-4 focus:ring-primary-200 dark:focus:ring-primary-900 hover:bg-primary-800">
-                        Update Holiday
+                        Update Language
                     </button>
                 </form>
             </div>

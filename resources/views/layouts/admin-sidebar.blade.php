@@ -60,6 +60,33 @@
                 </ul>
             </li>
 
+            <!-- lanugages -->
+            <li>
+                <button type="button" class="flex items-center w-full p-2 text-base text-gray-900 transition duration-75 rounded-lg group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700" aria-controls="dropdown-example3" data-collapse-toggle="dropdown-example4">
+
+                    <svg class="flex-shrink-0 w-5 h-5 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10
+           10-4.48 10-10S17.52 2 12 2zm5.93 6h-3.29a17.84
+           17.84 0 0 0-1.35-3.36A8.04 8.04 0 0 1 17.93 8zM12
+           4.07A15.91 15.91 0 0 1 13.95 8h-3.9A15.91 15.91 0
+           0 1 12 4.07zM4.26 8a8.04 8.04 0 0 1 4.64-3.36A17.84
+           17.84 0 0 0 7.55 8H4.26zM4 12c0-.69.1-1.36.26-2h3.66a20.4
+           20.4 0 0 0 0 4H4." />
+                    </svg>
+
+                    <span class="flex-1 ms-3 text-left rtl:text-right whitespace-nowrap">Languages</span>
+
+                    <svg class="w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                    </svg>
+                </button>
+                <ul id="dropdown-example4" class="hidden py-2 space-y-2">
+                    <li>
+                        <a href="{{ route('languages') }}" class="flex items-center w-full p-2 text-gray-900 transition duration-75 rounded-lg pl-11 group hover:bg-gray-100 dark:text-white dark:hover:bg-gray-700">All Languages</a>
+                    </li>
+                </ul>
+            </li>
+
         </ul>
     </div>
 </aside>

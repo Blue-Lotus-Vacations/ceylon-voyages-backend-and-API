@@ -1,5 +1,6 @@
  @props([
  'destination_category',
+ 'languages'
  ])
 
  <div id="create-holiday-accordion-collapse" data-accordion="collapse">
@@ -22,36 +23,50 @@
          aria-labelledby="create-holiday-accordion-collapse-heading-1">
          <div class="py-4 border-gray-200 sm:py-5 dark:border-gray-700">
              <div class="space-y-4 sm:space-y-6">
-                 <!-- holiday name, price, no of nights -->
-                 <div class="space-y-4 sm:flex sm:space-x-4 sm:space-y-0">
 
-                     <!-- Destination Category Name -->
-                     <div class="w-full">
-                         <label for="destination_category_name"
-                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Destination Category Name</label>
-                         <input type="text"
-                             value="{{ old('destination_category_name', $destination_category->destination_category_name ?? '') }}"
-                             name="destination_category_name"
-                             id="destination_category_name"
-                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                             placeholder="Type Destination Category Name">
-                         <x-input-error :messages="$errors->get('destination_category_name')" class="mt-2" />
-                     </div>
+                 @php
+                 $languageCodes = collect($languages)->pluck('language_code')->toArray();
+                 @endphp
 
-                     <!-- Slug -->
-                     <div class="w-full">
-                         <label for="slug"
-                             class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slug</label>
-                         <input type="text"
-                             value="{{ old('slug', $destination_category->slug ?? '') }}"
-                             name="slug"
-                             id="slug"
-                             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                             placeholder="Slug will be auto-generated (but you can edit)">
-                         <div id="slug-status" class="text-sm mt-1"></div>
-                         <x-input-error :messages="$errors->get('slug')" class="mt-2" />
-                     </div>
+                 @php
+                 $categoryNames = json_decode($destination_category->destination_category_name ?? '{}', true);
+                 @endphp
+
+                 <!-- Language Fields -->
+                 @foreach ($languages as $language)
+                 <div class="mb-4">
+                     <label for="destination_category_name_{{ $language->language_code }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                         Destination Category Name ({{ $language->language }})
+                     </label>
+                     <input type="text"
+                         data-lang="{{ $language->language_code }}"
+                         class="destination-category-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                         id="destination_category_name_{{ $language->language_code }}"
+                         placeholder="Enter category name in {{ $language->language }}"
+                         value="{{ old('destination_category_name_' . $language->language_code, $categoryNames[$language->language_code] ?? '') }}">
+
                  </div>
+                 @endforeach
+
+                 <!-- Hidden JSON Field -->
+                 <input type="hidden" name="destination_category_name" id="destination_category_name_json" value="{}">
+
+                 <!-- Slug Input (Auto from English) -->
+                 <div class="mb-4">
+                     <label for="slug" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                         Slug <small class="text-xs text-gray-500">(auto-generated from English name)</small>
+                     </label>
+                     <input type="text"
+                         name="slug"
+                         id="slug"
+                         readonly
+                         class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                         placeholder="Slug will be auto-generated from English name"
+                         value="{{ old('slug', $destination_category->slug ?? '') }}">
+
+                     <div id="slug-status" class="text-sm mt-1"></div>
+                 </div>
+
 
                  <div class="w-full">
 
@@ -180,67 +195,87 @@
              });
          </script>
 
+
          @push('scripts')
          <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
          <script>
-             function slugify(text) {
-                 return text.toLowerCase()
-                     .trim()
-                     .replace(/\s+/g, '-') // Replace spaces with -
-                     .replace(/[^\w\-]+/g, '') // Remove special characters
-                     .replace(/\-\-+/g, '-'); // Replace multiple - with single -
-             }
+             document.addEventListener("DOMContentLoaded", function() {
+                 const langInputs = document.querySelectorAll('.destination-category-input');
+                 const jsonField = document.getElementById('destination_category_name_json');
+                 const slugField = document.getElementById('slug');
+                 const slugStatus = document.getElementById('slug-status');
+                 let nameData = {};
 
-             $(document).ready(function() {
-                 let typingTimer;
-                 const doneTypingInterval = 500;
+                 function slugify(text) {
+                     return text.toLowerCase()
+                         .trim()
+                         .replace(/\s+/g, '-')
+                         .replace(/[^\w\-]+/g, '')
+                         .replace(/\-\-+/g, '-');
+                 }
 
-                 $('#destination_category_name').on('input', function() {
-                     const slug = slugify($(this).val());
-                     $('#slug').val(slug);
-                     checkSlugAvailability(slug);
-                 });
-
-                 $('#slug').on('input', function() {
-                     clearTimeout(typingTimer);
-                     const slug = $(this).val();
-                     typingTimer = setTimeout(() => {
-                         checkSlugAvailability(slug);
-                     }, doneTypingInterval);
-                 });
+                 function updateJSON() {
+                     nameData = {};
+                     langInputs.forEach(input => {
+                         const lang = input.getAttribute('data-lang');
+                         const val = input.value.trim();
+                         if (val !== '') {
+                             nameData[lang] = val;
+                         }
+                     });
+                     jsonField.value = JSON.stringify(nameData);
+                 }
 
                  function checkSlugAvailability(slug) {
                      if (!slug) {
-                         $('#slug-status').text('').removeClass('text-green-600 text-red-600');
+                         slugStatus.textContent = '';
                          return;
                      }
 
-                     $.ajax({
-                         url: '{{ url("/destination-category/check-slug") }}',
-                         method: 'GET',
-                         data: {
-                             slug: slug
-                         },
-                         success: function(res) {
-                             if (res.available) {
-                                 $('#slug-status')
-                                     .text('✅ Slug is available')
-                                     .removeClass('text-red-600')
-                                     .addClass('text-green-600');
+                     slugStatus.textContent = 'Checking...';
+                     slugStatus.className = 'text-sm mt-1 text-gray-500';
+
+                     fetch(`{{ url('/destination-category/check-slug') }}?slug=${encodeURIComponent(slug)}`)
+                         .then(res => res.json())
+                         .then(data => {
+                             if (data.available) {
+                                 slugStatus.textContent = '✅ Slug is available';
+                                 slugStatus.className = 'text-sm mt-1 text-green-600';
                              } else {
-                                 $('#slug-status')
-                                     .text('❌ Slug is already taken')
-                                     .removeClass('text-green-600')
-                                     .addClass('text-red-600');
+                                 slugStatus.textContent = '❌ Slug is already taken';
+                                 slugStatus.className = 'text-sm mt-1 text-red-600';
                              }
-                         },
-                         error: function() {
-                             $('#slug-status')
-                                 .text('Error checking slug.')
-                                 .removeClass('text-green-600')
-                                 .addClass('text-red-600');
+                         })
+                         .catch(() => {
+                             slugStatus.textContent = 'Error checking slug';
+                             slugStatus.className = 'text-sm mt-1 text-red-600';
+                         });
+                 }
+
+                 langInputs.forEach(input => {
+                     input.addEventListener('input', function() {
+                         const lang = this.getAttribute('data-lang');
+                         updateJSON();
+
+                         // If it's English (en), update slug
+                         if (lang === 'en') {
+                             const slug = slugify(this.value);
+                             slugField.value = slug;
+                             checkSlugAvailability(slug);
                          }
                      });
+                 });
+
+                 // ✅ Initialize nameData and slug from prefilled values
+                 updateJSON();
+
+                 // ✅ If English field is already filled, generate and validate slug on load
+                 const enInput = document.querySelector('[data-lang="en"]');
+                 if (enInput && enInput.value.trim() !== '') {
+                     const initialSlug = slugify(enInput.value);
+                     slugField.value = initialSlug;
+                     checkSlugAvailability(initialSlug);
                  }
              });
          </script>

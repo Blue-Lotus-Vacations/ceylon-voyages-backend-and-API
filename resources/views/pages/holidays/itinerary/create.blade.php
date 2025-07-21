@@ -5,16 +5,46 @@
 
                 <form id="itinerary-form" action="{{ route('holiday.itenery-store', $holiday) }}" method="post" enctype="multipart/form-data">
                     @csrf
-                    <div>
-                        <div class="mb-5">
-                            <label for="day_title" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Day Title</label>
-                            <input type="text" name="day_title" id="day_title" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
-                        </div>
 
+                    @php
+                    $languageCodes = collect($languages)->pluck('language_code')->toArray();
+                    @endphp
+
+                    <div>
+                        @foreach ($languages as $language)
                         <div class="mb-5">
-                            <label for="day_description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
-                            <textarea rows="10" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" name="day_description" id="day_description"></textarea>
+                            <label for="day_title_{{ $language->language_code }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Day Title ({{ $language->language }})
+                            </label>
+                            <input type="text"
+                                data-title-lang="{{ $language->language_code }}"
+                                class="day-title-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                id="day_title_{{ $language->language_code }}"
+                                placeholder="Enter day title in {{ $language->language }}"
+                                value="{{ old('day_title_' . $language->language_code, $dayTitle[$language->language_code] ?? '') }}">
                         </div>
+                        @endforeach
+
+                        <!-- Hidden JSON Field -->
+                        <input type="hidden" name="day_title" id="day_title_json" value="{}">
+
+                        @foreach ($languages as $language)
+                        <div class="mb-5">
+                            <label for="day_description_{{ $language->language_code }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                                Description ({{ $language->language }})
+                            </label>
+                            <textarea rows="10"
+                                data-desc-lang="{{ $language->language_code }}"
+                                class="day-description-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                                name="day_description_{{ $language->language_code }}"
+                                id="day_description_{{ $language->language_code }}"
+                                placeholder="Enter description in {{ $language->language }}">{{ old('day_description_' . $language->language_code, $dayDescription[$language->language_code] ?? '') }}</textarea>
+                        </div>
+                        @endforeach
+
+                        <!-- Hidden JSON Field -->
+                        <input type="hidden" name="day_description" id="day_description_json" value="{}">
+
 
                         <div class="mb-5">
                             <label for="day_images" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Day Images</label>
@@ -112,4 +142,63 @@
                 .catch(error => console.log('Error:', error));
         }
     </script>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dayTitleInputs = document.querySelectorAll('.day-title-input');
+            const dayTitleJsonField = document.getElementById('day_title_json');
+            let dayTitleData = {};
+
+            function updateDayTitleJSON() {
+                dayTitleData = {};
+                dayTitleInputs.forEach(input => {
+                    const lang = input.getAttribute('data-title-lang');
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        dayTitleData[lang] = val;
+                    }
+                });
+                dayTitleJsonField.value = JSON.stringify(dayTitleData);
+            }
+
+            // Bind input events
+            dayTitleInputs.forEach(input => {
+                input.addEventListener('input', updateDayTitleJSON);
+            });
+
+            // Prefill data on load
+            updateDayTitleJSON();
+        });
+    </script>
+
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const descInputs = document.querySelectorAll('.day-description-input');
+            const descJsonField = document.getElementById('day_description_json');
+            let descData = {};
+
+            function updateDayDescriptionJSON() {
+                descData = {};
+                descInputs.forEach(input => {
+                    const lang = input.getAttribute('data-desc-lang');
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        descData[lang] = val;
+                    }
+                });
+                descJsonField.value = JSON.stringify(descData);
+            }
+
+            descInputs.forEach(input => {
+                input.addEventListener('input', updateDayDescriptionJSON);
+            });
+
+            updateDayDescriptionJSON();
+        });
+    </script>
+
+
 </x-app-layout>
