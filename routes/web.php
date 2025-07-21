@@ -17,6 +17,7 @@ use App\Http\Controllers\HolidayController;
 use App\Http\Controllers\AssetController;
 use App\Http\Controllers\DestinationCategoryController;
 use App\Http\Controllers\DestinationController;
+use App\Http\Controllers\LanguageController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -65,6 +66,13 @@ Route::middleware('auth')->group(function () {
     Route::get('/destinations/create-destinations', [DestinationController::class, 'create'])->name('destination-create');
     Route::post('/destinations/create-destinations', [DestinationController::class, 'store'])->name('destination.store');
     Route::get('/destinations/check-slug', [DestinationController::class, 'checkSlug'])->name('destination.slug');
+
+    //languages
+    Route::get('/languages', [LanguageController::class, 'index'])->name('languages');
+    Route::get('/languages/create-languages', [LanguageController::class, 'create'])->name('language-create');
+    Route::post('/languages/create-languages', [LanguageController::class, 'store'])->name('language.store');
+    Route::get('/languages/edit-language/{language_id}', [LanguageController::class, 'edit'])->name('language.edit');
+     Route::put('/languages/edit-language/{language_id}', [LanguageController::class, 'update'])->name('language.update');
 
     //assets
     Route::delete('/assets/{asset_id}', [AssetController::class, 'destroy'])->name('assets.delete');

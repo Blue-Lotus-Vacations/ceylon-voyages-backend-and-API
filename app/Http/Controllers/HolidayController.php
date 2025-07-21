@@ -7,6 +7,7 @@ use App\Models\Asset;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreHolidayRequest;
 use App\Http\Requests\UpdateHolidayRequest;
+use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -27,7 +28,9 @@ class HolidayController extends Controller
      */
     public function create()
     {
-        return view('pages.holidays.create');
+         $languages = Language::all();
+
+        return view('pages.holidays.create')->with('languages', $languages);
     }
 
     /**
@@ -49,6 +52,8 @@ class HolidayController extends Controller
             'aditional_information' => 'required',
             'slug' => 'required'
         ]);
+
+        // dd($validatedData);
 
         // Is Favourite 
         if ($request->isFavorite == "on") {
@@ -73,6 +78,7 @@ class HolidayController extends Controller
             $validatedData['itinerary_card'] = json_encode($savedItineraryCards, JSON_UNESCAPED_SLASHES);
         }
 
+        // dd($validatedData);
 
 
         #region cost includes json
@@ -91,6 +97,7 @@ class HolidayController extends Controller
             $validatedData['cost_includes'] = json_encode($savedCostIncludes, JSON_UNESCAPED_SLASHES);
         }
 
+        // dd($validatedData);
 
         #region tour map Json
         $savedMulticities = [];
@@ -168,12 +175,15 @@ class HolidayController extends Controller
 
         $tour_map = json_decode($holiday->tour_map, true);
 
+        $languages = Language::all();
+
         return view('pages.holidays.edit')->with(
             [
                 'holiday' => $holiday,
                 'itinerary_cards' => $itinerary_cards,
                 'cost_includes' => $cost_includes,
                 'multicities' => $tour_map,
+                'languages' => $languages
             ]
         );
     }
@@ -450,7 +460,10 @@ class HolidayController extends Controller
 
     public function itinerary_create(Request $request, Holiday $holiday)
     {
-        return view('pages.holidays.itinerary.create')->with('holiday', $holiday);
+
+        $languages = Language::all();
+
+        return view('pages.holidays.itinerary.create')->with(['holiday'=> $holiday, 'languages' => $languages]);
     }
 
     public function itinerary_store(Request $request, Holiday $holiday)
@@ -518,8 +531,11 @@ class HolidayController extends Controller
                 break;
             }
         }
+
+        $languages = Language::all();
+
         // dd($itinerary);
-        return view('pages.holidays.itinerary.edit')->with(['holiday' => $holiday, 'itinerary' => $itinerary]);
+        return view('pages.holidays.itinerary.edit')->with(['holiday' => $holiday, 'itinerary' => $itinerary, 'languages' => $languages]);
     }
 
     public function itinerary_update(Request $request, Holiday $holiday, $itineraryid)
