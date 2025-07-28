@@ -11,6 +11,7 @@ use App\Models\Language;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
+
 class HolidayController extends Controller
 {
     /**
@@ -28,7 +29,7 @@ class HolidayController extends Controller
      */
     public function create()
     {
-         $languages = Language::all();
+        $languages = Language::all();
 
         return view('pages.holidays.create')->with('languages', $languages);
     }
@@ -463,7 +464,7 @@ class HolidayController extends Controller
 
         $languages = Language::all();
 
-        return view('pages.holidays.itinerary.create')->with(['holiday'=> $holiday, 'languages' => $languages]);
+        return view('pages.holidays.itinerary.create')->with(['holiday' => $holiday, 'languages' => $languages]);
     }
 
     public function itinerary_store(Request $request, Holiday $holiday)
@@ -688,7 +689,7 @@ class HolidayController extends Controller
     }
 
 
-     public function checkSlug(Request $request)
+    public function checkSlug(Request $request)
     {
         $slug = $request->query('slug');
 
@@ -697,4 +698,6 @@ class HolidayController extends Controller
         return response()->json(['available' => !$exists]);
     }
 
+
+    
 }

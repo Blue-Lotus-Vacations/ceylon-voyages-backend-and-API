@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\DestinationCategoryController;
 use App\Http\Controllers\DestinationController;
+use App\Http\Controllers\EnquiryController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HolidayController;
@@ -24,3 +25,4 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     Route::get('/holidays', [HolidayController::class, 'holidayApi']);
     Route::get('/destinations', [DestinationController::class, 'destinationApi']);
     Route::get('/destination-categories', [DestinationCategoryController::class, 'destinationCategoryApi']);
+    Route::post('/enquiry', [EnquiryController::class, 'enquiry']);
