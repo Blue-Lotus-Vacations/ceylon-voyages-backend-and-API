@@ -65,6 +65,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/destinations', [DestinationController::class, 'index'])->name('destinations');
     Route::get('/destinations/create-destinations', [DestinationController::class, 'create'])->name('destination-create');
     Route::post('/destinations/create-destinations', [DestinationController::class, 'store'])->name('destination.store');
+    Route::get('/destinations/edit-destination/{destination_id}', [DestinationController::class, 'edit'])->name('destination.edit');
+    Route::put('/destinations/edit-destination/{destination_id', [DestinationController::class, 'update'])->name('destination.update');
     Route::get('/destinations/check-slug', [DestinationController::class, 'checkSlug'])->name('destination.slug');
 
     //languages

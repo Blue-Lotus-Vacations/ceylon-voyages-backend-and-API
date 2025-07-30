@@ -1,5 +1,13 @@
 @props([
 'destination_categories',
+'destination',
+'languages',
+'highlights',
+'visit_times',
+'worth_visit',
+'food',
+'culture'
+
 ])
 
 <div id="create-holiday-accordion-collapse" data-accordion="collapse">
@@ -23,70 +31,100 @@
         <div class="py-4 border-gray-200 sm:py-5 dark:border-gray-700">
             <div class="space-y-4 sm:space-y-6">
                 <!-- holiday name, price, no of nights -->
+
+                @php
+                $languageCodes = collect($languages)->pluck('language_code')->toArray();
+                @endphp
+
+
+                @php
+                $destinationName = json_decode($destination->destination_name ?? '{}', true);
+                @endphp
+
+
+                @php
+                $destinationCardSummary = json_decode($destination->destination_card_summary ?? '{}', true);
+                @endphp
+
+
                 <div class="space-y-4 sm:flex sm:space-x-4 sm:space-y-0">
 
-                    <!-- destination name -->
-                    <div class="w-full">
-                        <label for="destination_name"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Destination Name</label>
-                        <input type="text" value="{{ old('destination_name', $destination->destination_name ?? '') }}"
-                            name="destination_name" id="destination_name"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="Type Destination Name">
-                        <x-input-error :messages="$errors->get('destination_name')" class="mt-2" />
-                    </div>
-
-
-                    <!-- slug -->
-                    <div class="w-full">
-                        <label for="slug"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Slug</label>
+                    <!-- Destination Name Fields (Multilingual) -->
+                    @foreach ($languages as $language)
+                    <div class="mb-4 w-full">
+                        <label for="destination_name_{{ $language->language_code }}" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Destination Name ({{ $language->language }})
+                        </label>
                         <input type="text"
-                            value="{{ old('slug', $destination->slug ?? '') }}"
-                            name="slug"
-                            id="slug"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                            placeholder="Slug will be auto-generated (but you can edit)">
-                        <div id="slug-status" class="text-sm mt-1"></div>
-                        <x-input-error :messages="$errors->get('slug')" class="mt-2" />
+                            data-lang="{{ $language->language_code }}"
+                            class="destination-name-input bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                            id="destination_name_{{ $language->language_code }}"
+                            placeholder="Enter destination name in {{ $language->language }}"
+                            value="{{ old('destination_name_' . $language->language_code, $destinationName[$language->language_code] ?? '') }}">
                     </div>
+                    @endforeach
 
-
-                    <!-- Category -->
-                    <div class="w-full">
-                        <label for="destination_category"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category </label>
-                        <select oninput="getSelectedCategory()" id="destination_category" name="destination_category"
-                            class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
-                            <option selected disabled>Select One</option>
-                            @foreach ($destination_categories as $destination_category)
-                            <option value="{{ $destination_category->id }}"
-                                {{ old('destination_category', isset($destination) ? $destination->destination_category : null) == $destination_category->id ? 'selected' : '' }}>
-                                {{ $destination_category->destination_category_name }}
-                            </option>
-                            @endforeach
-                        </select>
-                        <x-input-error :messages="$errors->get('destination_category')" class="mt-2" />
-                    </div>
+                    <!-- Hidden JSON Field for Destination Name -->
+                    <input type="hidden" name="destination_name" id="destination_name_json" value="{}">
 
                 </div>
 
+                <!-- Slug Field -->
+                <div class="mb-4">
+                    <label for="slug" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                        Slug <small class="text-xs text-gray-500">(auto-generated from English name)</small>
+                    </label>
+                    <input type="text"
+                        name="slug"
+                        id="slug"
+                        readonly
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                        placeholder="Slug will be auto-generated from English name"
+                        value="{{ old('slug', $destination->slug ?? '') }}">
+
+                    <div id="slug-status" class="text-sm mt-1"></div>
+                </div>
+
+
+                <!-- Category -->
+                <div class="w-full">
+                    <label for="destination_category"
+                        class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Category </label>
+                    <select oninput="getSelectedCategory()" id="destination_category" name="destination_category"
+                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500">
+                        <option selected disabled>Select One</option>
+                        @foreach ($destination_categories as $destination_category)
+                        <option value="{{ $destination_category->id }}"
+                            {{ old('destination_category', isset($destination) ? $destination->destination_category : null) == $destination_category->id ? 'selected' : '' }}>
+                            {{ $destination_category->destination_category_name }}
+                        </option>
+                        @endforeach
+                    </select>
+                    <x-input-error :messages="$errors->get('destination_category')" class="mt-2" />
+                </div>
+
+
+
 
                 <!-- destination card summary -->
-                <div class="space-y-4 sm:space-y-6">
-                    <div>
-                        <label for="destination_card_summary"
-                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Destination Card Summary</label>
-                        <div
-                            class="mb-4 w-full bg-gray-100 rounded-lg border border-gray-200 dark:bg-gray-700 dark:border-gray-600">
-                            <div class="py-2 px-4 bg-gray-50 rounded-b-lg dark:bg-gray-700">
-                                <textarea name="destination_card_summary" id="destination_card_summary" rows="10"
-                                    class="block px-0 w-full text-sm text-gray-800 bg-gray-50 border-0 dark:bg-gray-700 focus:ring-0 dark:text-white dark:placeholder-gray-400"
-                                    placeholder="Write Destination Card Description">{{ old('destination_card_summary', $destination->destination_card_summary ?? '') }}</textarea>
-                            </div>
-                        </div>
-                        <x-input-error :messages="$errors->get('destination_card_summary')" class="mt-2" />
+                <div class="grid grid-cols-2 gap-4 mt-2">
+                    @foreach ($languages as $language)
+                    <div class="mb-4">
+                        <label for="destination_card_summary_{{ $language->language_code }}"
+                            class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">
+                            Destination Card Summary ({{ $language->language }})
+                        </label>
+                        <textarea
+                            id="destination_card_summary_{{ $language->language_code }}"
+                            data-summary-lang="{{ $language->language_code }}"
+                            rows="6"
+                            placeholder="Enter summary in {{ $language->language }}"
+                            class="destination-card-summary-input block w-full text-sm text-gray-900 bg-gray-50 border border-gray-300 rounded-lg p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400">{{ old('destination_card_summary_' . $language->language_code, $destinationCardSummary[$language->language_code] ?? '') }}</textarea>
                     </div>
+                    @endforeach
+
+                    <!-- Hidden JSON Field -->
+                    <input type="hidden" name="destination_card_summary" id="destination_card_summary_json" value="{}">
                 </div>
 
 
@@ -149,24 +187,31 @@
                             <hr class="my-2">
                         </div>
 
-                        <!-- Input for Adding Highlights -->
-                        <div class="grid grid-cols-1 gap-4">
+                        <!-- Input for Adding Highlights (Multilingual) -->
+                        <div class="grid grid-cols-1 gap-4" id="highlight-description-container">
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="highlight-description" class="text-gray-600 text-sm font-medium">Highlight Description</label>
-                                <input id="highlight-description" type="text"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Enter highlight description">
+                                <label for="highlight-description-{{ $language->language_code }}"
+                                    class="text-gray-600 text-sm font-medium">Highlight ({{ $language->language }})</label>
+                                <input type="text"
+                                    id="highlight-description-{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    class="highlight-description mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    placeholder="Enter highlight in {{ $language->language }}">
                             </div>
+                            @endforeach
                         </div>
 
                         <!-- Add Highlight Button -->
                         <div class="flex justify-start mt-4">
-                            <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md" id="add-highlight">Add Highlight</button>
+                            <button type="button" class="bg-green-500 text-white px-4 py-2 rounded-md" id="add-highlight">
+                                Add Highlight
+                            </button>
                         </div>
 
-                        <!-- Highlights Card Details Section -->
+                        <!-- Highlight Card Details Section -->
                         <div class="mt-6 space-y-4" id="highlight-details">
-                            <!-- Dynamic highlights will appear here -->
+                            <!-- Dynamic multilingual highlight cards will appear here -->
                         </div>
 
                         <!-- Hidden input to store JSON -->
@@ -218,24 +263,31 @@
                             <hr class="my-2">
                         </div>
 
-                        <!-- Input for Adding Visit Time -->
-                        <div class="grid grid-cols-1 gap-4">
+                        <!-- Input for Adding Best Time To Visit (Multilingual) -->
+                        <div class="grid grid-cols-1 gap-4" id="visit-time-inputs">
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="visit-time" class="text-gray-600 text-sm font-medium">Best Time To Visit</label>
-                                <input id="visit-time" type="text"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Enter time to visit">
+                                <label for="visit-description-{{ $language->language_code }}"
+                                    class="text-gray-600 text-sm font-medium">Best Time To Visit ({{ $language->language }})</label>
+                                <input type="text"
+                                    id="visit-description-{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    class="visit-description mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    placeholder="Enter description in {{ $language->language }}">
                             </div>
+                            @endforeach
                         </div>
 
-                        <!-- Add Visit Time Button -->
+                        <!-- Add Button -->
                         <div class="flex justify-start mt-4">
-                            <button type="button" class="bg-indigo-500 text-white px-4 py-2 rounded-md" id="add-visit-time">Add Best Time To Visit</button>
+                            <button type="button" class="bg-indigo-500 text-white px-4 py-2 rounded-md" id="add-visit-time">
+                                Add Best Time To Visit
+                            </button>
                         </div>
 
-                        <!-- Visit Time Card Details Section -->
+                        <!-- Display Section -->
                         <div class="mt-6 space-y-4" id="visit-time-details">
-                            <!-- Dynamic visit times will appear here -->
+                            <!-- Dynamically added entries appear here -->
                         </div>
 
                         <!-- Hidden input to store JSON -->
@@ -246,34 +298,47 @@
 
 
 
+
+
                 <!-- worth a visit -->
                 <div class="p-5 border border-t-0 border-gray-200 dark:border-gray-700">
-                    <!-- Worth a Visit Details Section -->
+                    <!-- Worth a Visit Cards Display -->
                     <div class="bg-white p-4 mt-4">
                         <div class="space-y-4" id="worth-visit-details">
                             <!-- Existing Worth a Visit Items Will Be Rendered Here -->
                         </div>
                     </div>
 
-                    <!-- Add More Worth a Visit -->
+                    <!-- Add Worth a Visit Form -->
                     <div class="bg-white p-4 mt-4">
                         <h2 class="font-bold text-gray-700 text-xl mb-4">Add Worth a Visit</h2>
 
-                        <div class="grid grid-cols-1 gap-4">
+                        <div class="grid grid-cols-1 gap-4" id="worth-visit-inputs">
+                            <!-- Multilingual Heading Inputs -->
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="worth_visit_heading" class="text-gray-600 text-sm font-medium">Heading</label>
-                                <input id="worth_visit_heading" type="text"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Heading">
+                                <label for="worth_visit_heading_{{ $language->language_code }}" class="text-gray-600 text-sm font-medium">Heading ({{ $language->language }})</label>
+                                <input type="text"
+                                    id="worth_visit_heading_{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    class="worth-visit-heading mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    placeholder="Enter heading in {{ $language->language }}">
                             </div>
+                            @endforeach
 
+                            <!-- Multilingual Description Inputs -->
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="worth_visit_description" class="text-gray-600 text-sm font-medium">Description</label>
-                                <textarea id="worth_visit_description" rows="3"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Write description here"></textarea>
+                                <label for="worth_visit_description_{{ $language->language_code }}" class="text-gray-600 text-sm font-medium">Description ({{ $language->language }})</label>
+                                <textarea id="worth_visit_description_{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    rows="3"
+                                    class="worth-visit-description mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    placeholder="Write description in {{ $language->language }}"></textarea>
                             </div>
+                            @endforeach
 
+                            <!-- Image Upload -->
                             <div>
                                 <label for="worth_visit_image" class="text-gray-600 text-sm font-medium">Image</label>
                                 <input id="worth_visit_image" type="file" name="worth_visit_image[]"
@@ -285,11 +350,11 @@
                         <div class="flex justify-start mt-4">
                             <button type="button" class="bg-blue-600 text-white px-4 py-2 rounded-md" id="add-worth-visit">Add Worth a Visit</button>
                         </div>
+
+                        <!-- Hidden input -->
+                        <input type="hidden" id="worth_visit_json" name="worth_visit">
                     </div>
                 </div>
-
-                <!-- Hidden input for storing JSON -->
-                <input type="hidden" name="worth_visit_json" id="worth_visit_json">
 
 
                 <!-- food section -->
@@ -305,21 +370,36 @@
                     <div class="bg-white p-4 mt-4">
                         <h2 class="font-bold text-gray-700 text-xl mb-4">Add Food</h2>
 
-                        <div class="grid grid-cols-1 gap-4">
+                        <div class="grid grid-cols-1 gap-4" id="food-inputs">
+                            <!-- Multilingual Headings -->
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="food_heading" class="text-gray-600 text-sm font-medium">Food Name / Title</label>
-                                <input id="food_heading" type="text"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Eg: Traditional Rice & Curry">
+                                <label for="food_heading_{{ $language->language_code }}" class="text-gray-600 text-sm font-medium">
+                                    Food Name / Title ({{ $language->language }})
+                                </label>
+                                <input type="text"
+                                    id="food_heading_{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    class="food-heading mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    placeholder="Enter food title in {{ $language->language }}">
                             </div>
+                            @endforeach
 
+                            <!-- Multilingual Descriptions -->
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="food_description" class="text-gray-600 text-sm font-medium">Description</label>
-                                <textarea id="food_description" rows="3"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Write about the food item here"></textarea>
+                                <label for="food_description_{{ $language->language_code }}" class="text-gray-600 text-sm font-medium">
+                                    Description ({{ $language->language }})
+                                </label>
+                                <textarea id="food_description_{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    class="food-description mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    rows="3"
+                                    placeholder="Write about the food in {{ $language->language }}"></textarea>
                             </div>
+                            @endforeach
 
+                            <!-- Image -->
                             <div>
                                 <label for="food_image" class="text-gray-600 text-sm font-medium">Image</label>
                                 <input id="food_image" type="file" name="food_image[]"
@@ -385,24 +465,31 @@
                             <hr class="my-2">
                         </div>
 
-                        <!-- Input for Adding Culture Item -->
-                        <div class="grid grid-cols-1 gap-4">
+                        <!-- Input for Adding Culture (Multilingual) -->
+                        <div class="grid grid-cols-1 gap-4" id="culture-description-container">
+                            @foreach ($languages as $language)
                             <div>
-                                <label for="culture-input" class="text-gray-600 text-sm font-medium">Culture</label>
-                                <input id="culture-input" type="text"
-                                    class="mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
-                                    placeholder="Enter culture description or aspect">
+                                <label for="culture-description-{{ $language->language_code }}"
+                                    class="text-gray-600 text-sm font-medium">Culture ({{ $language->language }})</label>
+                                <input type="text"
+                                    id="culture-description-{{ $language->language_code }}"
+                                    data-lang="{{ $language->language_code }}"
+                                    class="culture-description mt-0.5 p-3 border border-gray-300 w-full text-gray-700 rounded text-sm focus:outline focus:outline-blue-500"
+                                    placeholder="Enter culture in {{ $language->language }}">
                             </div>
+                            @endforeach
                         </div>
 
                         <!-- Add Culture Button -->
                         <div class="flex justify-start mt-4">
-                            <button type="button" class="bg-purple-600 text-white px-4 py-2 rounded-md" id="add-culture">Add Culture</button>
+                            <button type="button" class="bg-purple-600 text-white px-4 py-2 rounded-md" id="add-culture">
+                                Add Culture
+                            </button>
                         </div>
 
                         <!-- Culture Card Details Section -->
                         <div class="mt-6 space-y-4" id="culture-details">
-                            <!-- Dynamic culture entries will appear here -->
+                            <!-- Dynamic multilingual culture cards will appear here -->
                         </div>
 
                         <!-- Hidden input to store JSON -->
@@ -586,48 +673,70 @@
 
     <!-- highlights -->
     <script>
-        // Array to store all highlight entries
         let highlightsArray = @json($highlights ?? []);
 
-        // Add new highlight
         document.getElementById('add-highlight').addEventListener('click', function() {
-            const input = document.getElementById('highlight-description');
-            const description = input.value.trim();
-            const highlightId = Date.now(); // Unique ID
+            const inputs = document.querySelectorAll('.highlight-description');
+            const descriptions = {};
+            let hasAtLeastOne = false;
 
-            if (!description) {
-                alert('Please enter a highlight description!');
+            inputs.forEach(input => {
+                const lang = input.dataset.lang;
+                const val = input.value.trim();
+                if (val !== '') {
+                    descriptions[lang] = val;
+                    hasAtLeastOne = true;
+                }
+            });
+
+            if (!hasAtLeastOne) {
+                alert('Please enter at least one language value!');
                 return;
             }
 
+            const highlightId = Date.now();
             const highlight = {
                 id: highlightId,
-                description: description,
+                description: descriptions,
+                created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
             };
 
             highlightsArray.push(highlight);
             document.getElementById('highlights-json').value = JSON.stringify(highlightsArray);
 
+            appendHighlight(highlight);
+
+            // Clear inputs
+            inputs.forEach(input => input.value = '');
+        });
+
+        // Load existing on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (Array.isArray(highlightsArray) && highlightsArray.length > 0) {
+                highlightsArray.forEach((item) => {
+                    appendHighlight(item);
+                });
+                document.getElementById('highlights-json').value = JSON.stringify(highlightsArray);
+            }
+        });
+
+        function appendHighlight(item) {
             const card = document.createElement('div');
-            card.setAttribute('id', `highlight-${highlightId}`);
+            card.setAttribute('id', `highlight-${item.id}`);
             card.classList.add(
-                'bg-green-100',
-                'p-4',
-                'rounded-lg',
-                'shadow-sm',
-                'flex',
-                'justify-between',
-                'items-center',
-                'hover:border-2',
-                'hover:border-green-500'
+                'bg-green-100', 'p-4', 'rounded-lg', 'shadow-sm',
+                'flex', 'justify-between', 'items-center',
+                'hover:border-2', 'hover:border-green-500'
             );
 
+            const descriptionsHtml = Object.entries(item.description)
+                .map(([lang, text]) => `<p class="text-sm text-gray-800"><strong>${lang}:</strong> ${text}</p>`)
+                .join('');
+
             card.innerHTML = `
+            <div>${descriptionsHtml}</div>
             <div>
-                <p class="text-gray-800">${description}</p>
-            </div>
-            <div>
-                <button type="button" class="remove-highlight-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-highlight-id="${highlightId}">Remove</button>
+                <button type="button" class="remove-highlight-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-highlight-id="${item.id}">Remove</button>
             </div>
         `;
 
@@ -636,159 +745,95 @@
             card.querySelector('.remove-highlight-btn').addEventListener('click', function() {
                 if (confirm('Are you sure you want to remove this highlight?')) {
                     card.remove();
-                    highlightsArray = highlightsArray.filter(h => h.id !== highlightId);
+                    highlightsArray = highlightsArray.filter((h) => h.id !== item.id);
                     document.getElementById('highlights-json').value = JSON.stringify(highlightsArray);
                 }
             });
-
-            input.value = '';
-        });
-
-        // Load existing highlights on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (highlightsArray.length > 0) {
-                highlightsArray.forEach((highlight) => {
-                    const card = document.createElement('div');
-                    card.setAttribute('id', `highlight-${highlight.id}`);
-                    card.classList.add(
-                        'bg-green-100',
-                        'p-4',
-                        'rounded-lg',
-                        'shadow-sm',
-                        'flex',
-                        'justify-between',
-                        'items-center',
-                        'hover:border-2',
-                        'hover:border-green-500'
-                    );
-
-                    card.innerHTML = `
-                    <div>
-                        <p class="text-gray-800">${highlight.description}</p>
-                    </div>
-                    <div>
-                        <button type="button" class="remove-highlight-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-highlight-id="${highlight.id}">Remove</button>
-                    </div>
-                `;
-
-                    document.getElementById('highlight-details').appendChild(card);
-
-                    card.querySelector('.remove-highlight-btn').addEventListener('click', function() {
-                        if (confirm('Are you sure you want to remove this highlight?')) {
-                            card.remove();
-                            highlightsArray = highlightsArray.filter(h => h.id !== highlight.id);
-                            document.getElementById('highlights-json').value = JSON.stringify(highlightsArray);
-                        }
-                    });
-                });
-
-                document.getElementById('highlights-json').value = JSON.stringify(highlightsArray);
-            }
-        });
+        }
     </script>
+
 
     <!-- best time to visit -->
     <script>
-        // Array to store all visit time entries
         let visitTimeArray = @json($visit_times ?? []);
 
-        // Add new visit time
         document.getElementById('add-visit-time').addEventListener('click', function() {
-            const input = document.getElementById('visit-time');
-            const timeValue = input.value.trim();
-            const visitTimeId = Date.now(); // Unique ID
+            const inputs = document.querySelectorAll('.visit-description');
+            const descriptions = {};
+            let hasAtLeastOne = false;
 
-            if (!timeValue) {
-                alert('Please enter a visit time!');
+            inputs.forEach(input => {
+                const lang = input.dataset.lang;
+                const val = input.value.trim();
+                if (val !== '') {
+                    descriptions[lang] = val;
+                    hasAtLeastOne = true;
+                }
+            });
+
+            if (!hasAtLeastOne) {
+                alert('Please enter at least one language value!');
                 return;
             }
 
+            const visitTimeId = Date.now();
             const visitTime = {
                 id: visitTimeId,
-                time: timeValue,
+                description: descriptions,
+                created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
             };
 
             visitTimeArray.push(visitTime);
             document.getElementById('visit-time-json').value = JSON.stringify(visitTimeArray);
 
+            appendVisitTime(visitTime);
+
+            // Clear inputs
+            inputs.forEach(input => input.value = '');
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (Array.isArray(visitTimeArray) && visitTimeArray.length > 0) {
+                visitTimeArray.forEach((item) => {
+                    appendVisitTime(item);
+                });
+                document.getElementById('visit-time-json').value = JSON.stringify(visitTimeArray);
+            }
+        });
+
+        function appendVisitTime(item) {
             const card = document.createElement('div');
-            card.setAttribute('id', `visit-time-${visitTimeId}`);
+            card.setAttribute('id', `visit-time-${item.id}`);
             card.classList.add(
-                'bg-indigo-100',
-                'p-4',
-                'rounded-lg',
-                'shadow-sm',
-                'flex',
-                'justify-between',
-                'items-center',
-                'hover:border-2',
-                'hover:border-indigo-500'
+                'bg-indigo-100', 'p-4', 'rounded-lg', 'shadow-sm',
+                'flex', 'justify-between', 'items-center',
+                'hover:border-2', 'hover:border-indigo-500'
             );
 
+            const descriptionsHtml = Object.entries(item.description)
+                .map(([lang, text]) => `<p class="text-sm text-gray-800"><strong>${lang}:</strong> ${text}</p>`)
+                .join('');
+
             card.innerHTML = `
+            <div>${descriptionsHtml}</div>
             <div>
-                <p class="text-gray-800">${timeValue}</p>
-            </div>
-            <div>
-                <button type="button" class="remove-visit-time-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-id="${visitTimeId}">Remove</button>
+                <button type="button" class="remove-visit-time-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-id="${item.id}">Remove</button>
             </div>
         `;
 
             document.getElementById('visit-time-details').appendChild(card);
 
             card.querySelector('.remove-visit-time-btn').addEventListener('click', function() {
-                if (confirm('Are you sure you want to remove this visit time?')) {
+                if (confirm('Are you sure you want to remove this entry?')) {
                     card.remove();
-                    visitTimeArray = visitTimeArray.filter(item => item.id !== visitTimeId);
+                    visitTimeArray = visitTimeArray.filter((t) => t.id !== item.id);
                     document.getElementById('visit-time-json').value = JSON.stringify(visitTimeArray);
                 }
             });
-
-            input.value = '';
-        });
-
-        // Load existing visit times on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (visitTimeArray.length > 0) {
-                visitTimeArray.forEach((item) => {
-                    const card = document.createElement('div');
-                    card.setAttribute('id', `visit-time-${item.id}`);
-                    card.classList.add(
-                        'bg-indigo-100',
-                        'p-4',
-                        'rounded-lg',
-                        'shadow-sm',
-                        'flex',
-                        'justify-between',
-                        'items-center',
-                        'hover:border-2',
-                        'hover:border-indigo-500'
-                    );
-
-                    card.innerHTML = `
-                    <div>
-                        <p class="text-gray-800">${item.time}</p>
-                    </div>
-                    <div>
-                        <button type="button" class="remove-visit-time-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-id="${item.id}">Remove</button>
-                    </div>
-                `;
-
-                    document.getElementById('visit-time-details').appendChild(card);
-
-                    card.querySelector('.remove-visit-time-btn').addEventListener('click', function() {
-                        if (confirm('Are you sure you want to remove this visit time?')) {
-                            card.remove();
-                            visitTimeArray = visitTimeArray.filter(t => t.id !== item.id);
-                            document.getElementById('visit-time-json').value = JSON.stringify(visitTimeArray);
-                        }
-                    });
-                });
-
-                document.getElementById('visit-time-json').value = JSON.stringify(visitTimeArray);
-            }
-        });
+        }
     </script>
+
+
 
 
     <!-- Worth a Visit  -->
@@ -805,13 +850,23 @@
                 card.setAttribute('id', `worth-visit-${item.id}`);
                 card.classList.add('bg-[#F7F9FC]', 'p-4', 'rounded-lg', 'shadow-sm', 'flex', 'justify-between', 'items-center', 'hover:border-2', 'hover:border-blue-500');
 
+                const headings = Object.entries(item.heading)
+                    .map(([lang, val]) => `<p class="text-sm"><strong>${lang} Heading:</strong> ${val}</p>`)
+                    .join('');
+
+                const descriptions = Object.entries(item.description)
+                    .map(([lang, val]) => `<p class="text-sm"><strong>${lang} Description:</strong> ${val}</p>`)
+                    .join('');
+
+                const imageHtml = item.full_path || item.image_base64 ?
+                    `<img src="${item.full_path || item.image_base64}" alt="Image" class="w-20 h-20 object-cover rounded-md">` :
+                    '';
+
                 card.innerHTML = `
-                <div>
-                    <dl class="grid grid-cols-2 gap-x-8 gap-y-2">
-                        <div><span class="font-semibold">Heading:</span> ${item.heading}</div>
-                        <div><span class="font-semibold">Description:</span> ${item.description}</div>
-                        <div><span class="font-semibold">Image:</span> <img src="${item.full_path || item.image_base64}" alt="Image" class="w-20 h-20 object-cover rounded-md"></div>
-                    </dl>
+                <div class="space-y-1">
+                    ${headings}
+                    ${descriptions}
+                    <div><strong>Image:</strong> ${imageHtml}</div>
                 </div>
                 <div>
                     <button type="button" class="remove-worth-btn bg-red-500 text-white rounded-full px-2 py-1 hover:bg-red-400" data-id="${item.id}">Remove</button>
@@ -835,18 +890,39 @@
                 updateHiddenInput();
             }
 
-            // Add new item
+            // Add new Worth a Visit item
             document.getElementById('add-worth-visit').addEventListener('click', function() {
-                const heading = document.getElementById('worth_visit_heading').value.trim();
-                const description = document.getElementById('worth_visit_description').value.trim();
+                const headingInputs = document.querySelectorAll('.worth-visit-heading');
+                const descriptionInputs = document.querySelectorAll('.worth-visit-description');
                 const imageFile = document.getElementById('worth_visit_image').files[0];
-                const id = Date.now();
 
-                if (!heading || !description || !imageFile) {
-                    alert('Please fill all the fields!');
+                const heading = {};
+                const description = {};
+                let hasHeading = false;
+                let hasDescription = false;
+
+                headingInputs.forEach(input => {
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        heading[input.dataset.lang] = val;
+                        hasHeading = true;
+                    }
+                });
+
+                descriptionInputs.forEach(input => {
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        description[input.dataset.lang] = val;
+                        hasDescription = true;
+                    }
+                });
+
+                if (!hasHeading || !hasDescription || !imageFile) {
+                    alert('Please fill all required fields including image!');
                     return;
                 }
 
+                const id = Date.now();
                 const reader = new FileReader();
 
                 reader.onloadend = function() {
@@ -863,9 +939,9 @@
                     updateHiddenInput();
                     renderCard(item);
 
-                    // Reset inputs
-                    document.getElementById('worth_visit_heading').value = '';
-                    document.getElementById('worth_visit_description').value = '';
+                    // Clear form
+                    headingInputs.forEach(input => input.value = '');
+                    descriptionInputs.forEach(input => input.value = '');
                     document.getElementById('worth_visit_image').value = '';
                 };
 
@@ -888,13 +964,23 @@
                 card.setAttribute('id', `food-${item.id}`);
                 card.classList.add('bg-[#F7F9FC]', 'p-4', 'rounded-lg', 'shadow-sm', 'flex', 'justify-between', 'items-center', 'hover:border-2', 'hover:border-green-500');
 
+                const headings = Object.entries(item.heading)
+                    .map(([lang, val]) => `<p class="text-sm"><strong>${lang} Name:</strong> ${val}</p>`)
+                    .join('');
+
+                const descriptions = Object.entries(item.description)
+                    .map(([lang, val]) => `<p class="text-sm"><strong>${lang} Description:</strong> ${val}</p>`)
+                    .join('');
+
+                const imageHtml = item.full_path || item.image_base64 ?
+                    `<img src="${item.full_path || item.image_base64}" alt="Image" class="w-20 h-20 object-cover rounded-md">` :
+                    '';
+
                 card.innerHTML = `
-                <div>
-                    <dl class="grid grid-cols-2 gap-x-8 gap-y-2">
-                        <div><span class="font-semibold">Food:</span> ${item.heading}</div>
-                        <div><span class="font-semibold">Description:</span> ${item.description}</div>
-                        <div><span class="font-semibold">Image:</span> <img src="${item.full_path || item.image_base64}" alt="Image" class="w-20 h-20 object-cover rounded-md"></div>
-                    </dl>
+                <div class="space-y-1">
+                    ${headings}
+                    ${descriptions}
+                    <div><strong>Image:</strong> ${imageHtml}</div>
                 </div>
                 <div>
                     <button type="button" class="remove-food-btn bg-red-500 text-white rounded-full px-2 py-1 hover:bg-red-400" data-id="${item.id}">Remove</button>
@@ -912,7 +998,7 @@
                 });
             };
 
-            // Load existing data on page load
+            // Load existing food on page load
             if (foodArray.length > 0) {
                 foodArray.forEach(renderFoodCard);
                 updateFoodInput();
@@ -920,16 +1006,37 @@
 
             // Add new food item
             document.getElementById('add-food').addEventListener('click', function() {
-                const heading = document.getElementById('food_heading').value.trim();
-                const description = document.getElementById('food_description').value.trim();
+                const headingInputs = document.querySelectorAll('.food-heading');
+                const descriptionInputs = document.querySelectorAll('.food-description');
                 const imageFile = document.getElementById('food_image').files[0];
-                const id = Date.now();
 
-                if (!heading || !description || !imageFile) {
-                    alert('Please fill all the fields!');
+                const heading = {};
+                const description = {};
+                let hasHeading = false;
+                let hasDescription = false;
+
+                headingInputs.forEach(input => {
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        heading[input.dataset.lang] = val;
+                        hasHeading = true;
+                    }
+                });
+
+                descriptionInputs.forEach(input => {
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        description[input.dataset.lang] = val;
+                        hasDescription = true;
+                    }
+                });
+
+                if (!hasHeading || !hasDescription || !imageFile) {
+                    alert('Please fill all required fields including image!');
                     return;
                 }
 
+                const id = Date.now();
                 const reader = new FileReader();
 
                 reader.onloadend = function() {
@@ -946,9 +1053,9 @@
                     updateFoodInput();
                     renderFoodCard(item);
 
-                    // Clear form
-                    document.getElementById('food_heading').value = '';
-                    document.getElementById('food_description').value = '';
+                    // Clear inputs
+                    headingInputs.forEach(input => input.value = '');
+                    descriptionInputs.forEach(input => input.value = '');
                     document.getElementById('food_image').value = '';
                 };
 
@@ -959,48 +1066,70 @@
 
     <!-- culture -->
     <script>
-        // Array to store all culture entries
         let cultureArray = @json($culture ?? []);
 
-        // Add new culture item
         document.getElementById('add-culture').addEventListener('click', function() {
-            const input = document.getElementById('culture-input');
-            const cultureValue = input.value.trim();
-            const cultureId = Date.now(); // Unique ID
+            const inputs = document.querySelectorAll('.culture-description');
+            const descriptions = {};
+            let hasAtLeastOne = false;
 
-            if (!cultureValue) {
-                alert('Please enter a culture value!');
+            inputs.forEach(input => {
+                const lang = input.dataset.lang;
+                const val = input.value.trim();
+                if (val !== '') {
+                    descriptions[lang] = val;
+                    hasAtLeastOne = true;
+                }
+            });
+
+            if (!hasAtLeastOne) {
+                alert('Please enter at least one language value!');
                 return;
             }
 
+            const cultureId = Date.now();
             const cultureItem = {
                 id: cultureId,
-                value: cultureValue
+                description: descriptions,
+                created_at: new Date().toISOString().slice(0, 19).replace('T', ' ')
             };
 
             cultureArray.push(cultureItem);
             document.getElementById('culture-json').value = JSON.stringify(cultureArray);
 
+            appendCulture(cultureItem);
+
+            // Clear inputs
+            inputs.forEach(input => input.value = '');
+        });
+
+        // Load existing culture entries on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            if (Array.isArray(cultureArray) && cultureArray.length > 0) {
+                cultureArray.forEach((item) => {
+                    appendCulture(item);
+                });
+                document.getElementById('culture-json').value = JSON.stringify(cultureArray);
+            }
+        });
+
+        function appendCulture(item) {
             const card = document.createElement('div');
-            card.setAttribute('id', `culture-${cultureId}`);
+            card.setAttribute('id', `culture-${item.id}`);
             card.classList.add(
-                'bg-purple-100',
-                'p-4',
-                'rounded-lg',
-                'shadow-sm',
-                'flex',
-                'justify-between',
-                'items-center',
-                'hover:border-2',
-                'hover:border-purple-600'
+                'bg-purple-100', 'p-4', 'rounded-lg', 'shadow-sm',
+                'flex', 'justify-between', 'items-center',
+                'hover:border-2', 'hover:border-purple-600'
             );
 
+            const descriptionsHtml = Object.entries(item.description)
+                .map(([lang, text]) => `<p class="text-sm text-gray-800"><strong>${lang}:</strong> ${text}</p>`)
+                .join('');
+
             card.innerHTML = `
+            <div>${descriptionsHtml}</div>
             <div>
-                <p class="text-gray-800">${cultureValue}</p>
-            </div>
-            <div>
-                <button type="button" class="remove-culture-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-id="${cultureId}">Remove</button>
+                <button type="button" class="remove-culture-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-id="${item.id}">Remove</button>
             </div>
         `;
 
@@ -1009,121 +1138,122 @@
             card.querySelector('.remove-culture-btn').addEventListener('click', function() {
                 if (confirm('Are you sure you want to remove this item?')) {
                     card.remove();
-                    cultureArray = cultureArray.filter(c => c.id !== cultureId);
+                    cultureArray = cultureArray.filter(c => c.id !== item.id);
                     document.getElementById('culture-json').value = JSON.stringify(cultureArray);
                 }
             });
-
-            input.value = '';
-        });
-
-        // Load existing culture items on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            if (cultureArray.length > 0) {
-                cultureArray.forEach((item) => {
-                    const card = document.createElement('div');
-                    card.setAttribute('id', `culture-${item.id}`);
-                    card.classList.add(
-                        'bg-purple-100',
-                        'p-4',
-                        'rounded-lg',
-                        'shadow-sm',
-                        'flex',
-                        'justify-between',
-                        'items-center',
-                        'hover:border-2',
-                        'hover:border-purple-600'
-                    );
-
-                    card.innerHTML = `
-                    <div>
-                        <p class="text-gray-800">${item.value}</p>
-                    </div>
-                    <div>
-                        <button type="button" class="remove-culture-btn bg-red-500 text-white px-2 py-1 rounded hover:bg-red-400" data-id="${item.id}">Remove</button>
-                    </div>
-                `;
-
-                    document.getElementById('culture-details').appendChild(card);
-
-                    card.querySelector('.remove-culture-btn').addEventListener('click', function() {
-                        if (confirm('Are you sure you want to remove this item?')) {
-                            card.remove();
-                            cultureArray = cultureArray.filter(c => c.id !== item.id);
-                            document.getElementById('culture-json').value = JSON.stringify(cultureArray);
-                        }
-                    });
-                });
-
-                document.getElementById('culture-json').value = JSON.stringify(cultureArray);
-            }
-        });
+        }
     </script>
 
 
-    <!-- slug script  -->
+
     @push('scripts')
-    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <!-- slug script  -->
     <script>
-        function slugify(text) {
-            return text.toLowerCase()
-                .trim()
-                .replace(/\s+/g, '-') // Replace spaces with -
-                .replace(/[^\w\-]+/g, '') // Remove special characters
-                .replace(/\-\-+/g, '-'); // Replace multiple - with single -
-        }
+        document.addEventListener("DOMContentLoaded", function() {
+            const langInputs = document.querySelectorAll('.destination-name-input');
+            const jsonField = document.getElementById('destination_name_json');
+            const slugField = document.getElementById('slug');
+            const slugStatus = document.getElementById('slug-status');
+            let nameData = {};
 
-        $(document).ready(function() {
-            let typingTimer;
-            const doneTypingInterval = 500;
+            function slugify(text) {
+                return text.toLowerCase()
+                    .trim()
+                    .replace(/\s+/g, '-')
+                    .replace(/[^\w\-]+/g, '')
+                    .replace(/\-\-+/g, '-');
+            }
 
-            $('#destination_name').on('input', function() {
-                const slug = slugify($(this).val());
-                $('#slug').val(slug);
-                checkSlugAvailability(slug);
-            });
-
-            $('#slug').on('input', function() {
-                clearTimeout(typingTimer);
-                const slug = $(this).val();
-                typingTimer = setTimeout(() => {
-                    checkSlugAvailability(slug);
-                }, doneTypingInterval);
-            });
+            function updateJSON() {
+                nameData = {};
+                langInputs.forEach(input => {
+                    const lang = input.getAttribute('data-lang');
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        nameData[lang] = val;
+                    }
+                });
+                jsonField.value = JSON.stringify(nameData);
+            }
 
             function checkSlugAvailability(slug) {
                 if (!slug) {
-                    $('#slug-status').text('').removeClass('text-green-600 text-red-600');
+                    slugStatus.textContent = '';
                     return;
                 }
 
-                $.ajax({
-                    url: '{{ url("/destinations/check-slug") }}',
-                    method: 'GET',
-                    data: {
-                        slug: slug
-                    },
-                    success: function(res) {
-                        if (res.available) {
-                            $('#slug-status')
-                                .text('✅ Slug is available')
-                                .removeClass('text-red-600')
-                                .addClass('text-green-600');
+                slugStatus.textContent = 'Checking...';
+                slugStatus.className = 'text-sm mt-1 text-gray-500';
+
+                fetch(`{{ url('/destinations/check-slug') }}?slug=${encodeURIComponent(slug)}`)
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.available) {
+                            slugStatus.textContent = '✅ Slug is available';
+                            slugStatus.className = 'text-sm mt-1 text-green-600';
                         } else {
-                            $('#slug-status')
-                                .text('❌ Slug is already taken')
-                                .removeClass('text-green-600')
-                                .addClass('text-red-600');
+                            slugStatus.textContent = '❌ Slug is already taken';
+                            slugStatus.className = 'text-sm mt-1 text-red-600';
                         }
-                    },
-                    error: function() {
-                        $('#slug-status')
-                            .text('Error checking slug.')
-                            .removeClass('text-green-600')
-                            .addClass('text-red-600');
+                    })
+                    .catch(() => {
+                        slugStatus.textContent = 'Error checking slug';
+                        slugStatus.className = 'text-sm mt-1 text-red-600';
+                    });
+            }
+
+            langInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    const lang = this.getAttribute('data-lang');
+                    updateJSON();
+
+                    if (lang === 'en') {
+                        const slug = slugify(this.value);
+                        slugField.value = slug;
+                        checkSlugAvailability(slug);
                     }
                 });
+            });
+
+            // Initialize slug from existing English field
+            const enInput = document.querySelector('[data-lang="en"]');
+            if (enInput && enInput.value.trim() !== '') {
+                const initialSlug = slugify(enInput.value);
+                slugField.value = initialSlug;
+                checkSlugAvailability(initialSlug);
             }
+
+            // Initialize JSON on load
+            updateJSON();
         });
     </script>
+
+    <!-- destination card summary    -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const summaryInputs = document.querySelectorAll('.destination-card-summary-input');
+            const summaryJsonField = document.getElementById('destination_card_summary_json');
+            let summaryData = {};
+
+            function updateSummaryJSON() {
+                summaryData = {};
+                summaryInputs.forEach(input => {
+                    const lang = input.getAttribute('data-summary-lang');
+                    const val = input.value.trim();
+                    if (val !== '') {
+                        summaryData[lang] = val;
+                    }
+                });
+                summaryJsonField.value = JSON.stringify(summaryData);
+            }
+
+            summaryInputs.forEach(input => {
+                input.addEventListener('input', updateSummaryJSON);
+            });
+
+            updateSummaryJSON();
+        });
+    </script>
+
     @endpush

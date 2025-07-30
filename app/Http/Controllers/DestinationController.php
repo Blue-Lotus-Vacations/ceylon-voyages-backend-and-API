@@ -10,6 +10,7 @@ use App\Models\DestinationCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Asset;
+use App\Models\Language;
 
 class DestinationController extends Controller
 {
@@ -18,7 +19,12 @@ class DestinationController extends Controller
      */
     public function index()
     {
-        return view('pages.destinations.index');
+
+        $languages = Language::all();
+
+        $destinations = Destination::with('assets')->orderBy('created_at', 'desc')->paginate(10);
+
+        return view('pages.destinations.index')->with('destinations', $destinations)->with('languages', $languages);
     }
 
     /**
@@ -29,10 +35,11 @@ class DestinationController extends Controller
 
         $destination_categories = DestinationCategory::all();
 
-
+        $languages = Language::all();
 
         return view('pages.destinations.create', [
-            'destination_categories' => $destination_categories
+            'destination_categories' => $destination_categories,
+            'languages' => $languages
         ]);
     }
 
@@ -85,7 +92,7 @@ class DestinationController extends Controller
 
                 $savedVisitTimes[] = [
                     "id" => $visitTime['id'],
-                    "description" => $visitTime['time'],
+                    "description" => $visitTime['description'],
                     "created_at" => now()->toDateTimeString()
                 ];
             }
@@ -102,7 +109,7 @@ class DestinationController extends Controller
 
                 $savedCultures[] = [
                     "id" => $culture['id'],
-                    "description" => $culture['value'],
+                    "description" => $culture['description'],
                     "created_at" => now()->toDateTimeString()
                 ];
             }
@@ -112,8 +119,8 @@ class DestinationController extends Controller
 
         #region worth a visit Json
         $savedWorthVisit = [];
-        if ($request->has('worth_visit_json')) {
-            $worthVisits = json_decode($request->worth_visit_json, true);
+        if ($request->has('worth_visit')) {
+            $worthVisits = json_decode($request->worth_visit, true);
 
             foreach ($worthVisits as $worthVisit) {
                 if (!empty($worthVisit['image_base64'])) {
@@ -262,9 +269,39 @@ class DestinationController extends Controller
     /**
      * Show the form for editing the specified resource.
      */
-    public function edit(Destination $destination)
+    public function edit($destination_id)
     {
-        //
+        // dd($destination_id);
+
+        $destination = Destination::with('assets')->find($destination_id);
+
+        $highlights = json_decode($destination->highlights, true);
+
+        $visit_time = json_decode($destination->visit_time, true);
+
+        $worth_a_visit = json_decode($destination->worth_a_visit, true);
+
+        $culture = json_decode($destination->culture, true);
+
+        $food = json_decode($destination->food, true);
+
+        $destination_categories = DestinationCategory::all();
+
+        $languages = Language::all();
+
+        return view('pages.destinations.edit')->with(
+            [
+                'destination_categories' => $destination_categories,
+                'destination' => $destination,
+                'languages' => $languages,
+                'highlights' => $highlights,
+                'visit_times' => $visit_time,
+                'worth_visit' => $worth_a_visit,
+                'food' => $food,
+                'culture' => $culture
+            ]
+        );
+
     }
 
     /**
